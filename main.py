@@ -8,7 +8,7 @@ class App(tk.Tk):
     super().__init__()
 
     # configure the root window
-    self.title('My Awesome App')
+    self.title('My Awesome App')s
     self.geometry('600x600+50+50')
 
     # label
