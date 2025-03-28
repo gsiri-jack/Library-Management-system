@@ -1,0 +1,183 @@
+[
+    {
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "genre": "Fiction",
+      "isbn": "1234567890",
+      "publisher": "Scribner",
+      "published_year": 1925,
+      "pages": 180
+    },
+    {
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "genre": "Classic",
+      "isbn": "1234567891",
+      "publisher": "J.B. Lippincott & Co.",
+      "published_year": 1960,
+      "pages": 281
+    },
+    {
+      "title": "1984",
+      "author": "George Orwell",
+      "genre": "Dystopian",
+      "isbn": "1234567892",
+      "publisher": "Secker & Warburg",
+      "published_year": 1949,
+      "pages": 328
+    },
+    {
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "genre": "Romance",
+      "isbn": "1234567893",
+      "publisher": "T. Egerton",
+      "published_year": 1813,
+      "pages": 279
+    },
+    {
+      "title": "Moby Dick",
+      "author": "Herman Melville",
+      "genre": "Adventure",
+      "isbn": "1234567894",
+      "publisher": "Harper & Brothers",
+      "published_year": 1851,
+      "pages": 635
+    },
+    {
+      "title": "Crime and Punishment",
+      "author": "Fyodor Dostoevsky",
+      "genre": "Psychological",
+      "isbn": "1234567899",
+      "publisher": "The Russian Messenger",
+      "published_year": 1866,
+      "pages": 671
+    },
+    {
+      "title": "Anna Karenina",
+      "author": "Leo Tolstoy",
+      "genre": "Drama",
+      "isbn": "9876543210",
+      "publisher": "The Russian Messenger",
+      "published_year": 1877,
+      "pages": 864
+    },
+    {
+      "title": "The Adventures of Sherlock Holmes",
+      "author": "Arthur Conan Doyle",
+      "genre": "Mystery",
+      "isbn": "9876543211",
+      "publisher": "George Newnes",
+      "published_year": 1892,
+      "pages": 307
+    },
+    {
+      "title": "Wuthering Heights",
+      "author": "Emily Brontë",
+      "genre": "Gothic",
+      "isbn": "9876543212",
+      "publisher": "Thomas Cautley Newby",
+      "published_year": 1847,
+      "pages": 416
+    },
+    {
+      "title": "The Catcher in the Rye",
+      "author": "J.D. Salinger",
+      "genre": "Fiction",
+      "isbn": "9876543213",
+      "publisher": "Little, Brown and Co.",
+      "published_year": 1951,
+      "pages": 277
+    },
+    {
+      "title": "Brave New World",
+      "author": "Aldous Huxley",
+      "genre": "Dystopian",
+      "isbn": "9876543214",
+      "publisher": "Chatto & Windus",
+      "published_year": 1932,
+      "pages": 311
+    },
+    {
+      "title": "The Hobbit",
+      "author": "J.R.R. Tolkien",
+      "genre": "Fantasy",
+      "isbn": "9876543215",
+      "publisher": "George Allen & Unwin",
+      "published_year": 1937,
+      "pages": 310
+    },
+    {
+      "title": "The Picture of Dorian Gray",
+      "author": "Oscar Wilde",
+      "genre": "Gothic",
+      "isbn": "9876543216",
+      "publisher": "Ward, Lock & Co.",
+      "published_year": 1890,
+      "pages": 254
+    },
+    {
+      "title": "Fahrenheit 451",
+      "author": "Ray Bradbury",
+      "genre": "Sci-Fi",
+      "isbn": "9876543217",
+      "publisher": "Ballantine Books",
+      "published_year": 1953,
+      "pages": 249
+    },
+    {
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "genre": "Adventure",
+      "isbn": "9876543218",
+      "publisher": "HarperOne",
+      "published_year": 1988,
+      "pages": 208
+    },
+    {
+      "title": "Les Misérables",
+      "author": "Victor Hugo",
+      "genre": "Historical",
+      "isbn": "9876543219",
+      "publisher": "A. Lacroix, Verboeckhoven & Cie",
+      "published_year": 1862,
+      "pages": 1463
+    },
+    {
+      "title": "Dracula",
+      "author": "Bram Stoker",
+      "genre": "Horror",
+      "isbn": "9876543220",
+      "publisher": "Archibald Constable",
+      "published_year": 1897,
+      "pages": 418
+    },
+    {
+      "title": "The Brothers Karamazov",
+      "author": "Fyodor Dostoevsky",
+      "genre": "Philosophical",
+      "isbn": "9876543221",
+      "publisher": "The Russian Messenger",
+      "published_year": 1880,
+      "pages": 824
+    },
+    {
+      "title": "The Count of Monte Cristo",
+      "author": "Alexandre Dumas",
+      "genre": "Adventure",
+      "isbn": "9876543222",
+      "publisher": "Pétion",
+      "published_year": 1844,
+      "pages": 1276
+    },
+    {
+      "title": "One Hundred Years of Solitude",
+      "author": "Gabriel García Márquez",
+      "genre": "Magical Realism",
+      "isbn": "9876543223",
+      "publisher": "Harper & Row",
+      "published_year": 1967,
+      "pages": 417
+    }
+  ]  
+
