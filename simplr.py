@@ -4,7 +4,7 @@ import customtkinter as ctk
 class LibraryManagement(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.title("Library Management")
+        self.title("Library Management system")
         self.geometry("600x400")
 
         self.container = ctk.CTkFrame(self)
