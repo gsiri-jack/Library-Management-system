@@ -46,5 +46,7 @@ stu.view_shelf(
     user_id="student_user_id2",
 )
 
-query = """CREATE TABLE IF NOT EXISTS reserveBooks(resrve_id INT AUTO_INCREMENT PRIMARY KEY, user_id VARCHAR(255), book_id INT, reserve_date DATETIME)"""
-staff.db_connection.execute_query(query)
+stu.reserve_book(
+    user_id="student_user_id2",
+    book_id=8
+)

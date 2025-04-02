@@ -30,11 +30,13 @@ class MySQLConnection:
                 cursorclass=self.cursorclass,
                 write_timeout=self.connect_timeout,
             )
-            if self.connection:
-                print("Connection to MySQL database successful")
+            # if self.connection:
+            #     # print("Connection to MySQL database successful")
+            #     return True
         except Error as e:
-            print(f"Error: {e}")
+            # print(f"Error: {e}")
             self.connection = None
+            return e
 
     def disconnect(self):
         if self.connection:
