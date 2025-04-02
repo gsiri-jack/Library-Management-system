@@ -263,7 +263,7 @@ class reserve_book_frame(ctk.CTkFrame):
 
 
 class student_view_books_frame(ctk.CTkFrame):
-    def __init__(self, master, app, user_id, username, is_verified, user_type):
+    def __init__(self, master, app, user_id, is_verified, user_type):
         super().__init__(master)
         self.app = app
         self.master = master
