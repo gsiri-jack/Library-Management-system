@@ -13,14 +13,14 @@ stu = student()
 # )
 
 
-staff.verify_user(
-    user_id="sample_user_id2",
-    password="sample_password2"
-)
+# staff.verify_user(
+#     user_id="sample_user_id2",
+#     password="sample_password2"
+# )
 
-staff.search_book(
-    genre="gothic",
-)
+# staff.search_book(
+#     genre="gothic",
+# )
 
 # query = """ """
 # staff.db_connection.execute_query(query)
@@ -31,10 +31,6 @@ staff.search_book(
 # Set the starting value for AUTO_INCREMENT (optional)
 # staff.db_connection.execute_query(
 #     "ALTER TABLE issues_table AUTO_INCREMENT = 1000")
-staff.issue_book(
-    user_id="student_user_id2",
-    book_id=1
-)
 
 
 # stu.verify_user(
@@ -42,11 +38,22 @@ staff.issue_book(
 #     password="student_password2"
 # )
 
-stu.view_shelf(
-    user_id="student_user_id2",
-)
 
 stu.reserve_book(
-    user_id="student_user_id2",
-    book_id=8
+    user_id="b",
+    book_id=6
+
 )
+
+staff.issue_book(
+    user_id="b",
+    book_id=2
+)
+
+
+res = stu.issued_books_table(
+    user_id="b"
+)
+
+for i in range(res[1]):
+    print(res[2][i]['title'])

@@ -58,7 +58,7 @@ class services:
         self.user_type = None
         return True, "User has been logged out successfully."
 
-    @require_verification
+    # @require_verification
     def search_book(self, title=None, author=None, genre=None, isbn=None):
         query = "SELECT * FROM book_table WHERE 1=1"
         params = []
@@ -80,10 +80,18 @@ class services:
             return True, results
         return False, "No books found."
 
+    def get_book_details(self, book_id, columnName):
+        query = "SELECT * FROM book_table WHERE book_id = %s"
+        params = (book_id,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            return result[0][columnName]
+        return False, "Book not found."
+
 
 class librarian(services):
-    @admin_only
-    @require_verification
+    # @admin_only
+    # @require_verification
     def insert_book(self, title, author, genre, isbn, publisher, published_year, pages):
         query = """
         INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages)
@@ -96,8 +104,8 @@ class librarian(services):
         except Error as e:
             return False, f"Error inserting book: {e}"
 
-    @admin_only
-    @require_verification
+    # @admin_only
+    # @require_verification
     def remove_book(self, book_id):
         query = "DELETE FROM book_table WHERE book_id = %s"
         params = (book_id,)
@@ -107,8 +115,8 @@ class librarian(services):
         except Error as e:
             return False, f"Error removing book: {e}"
 
-    @admin_only
-    @require_verification
+    # @admin_only
+    # @require_verification
     def create_user(self, user_id, username, password, user_type):
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(
@@ -124,8 +132,8 @@ class librarian(services):
         except Error as e:
             return False, f"Error creating user: {e}"
 
-    @admin_only
-    @require_verification
+    # @admin_only
+    # @require_verification
     def issue_book(self, user_id, book_id):
         query = "SELECT issue_id FROM issues_table WHERE book_id = %s"
         params = (book_id,)
@@ -154,8 +162,8 @@ class librarian(services):
             except Error as e:
                 return False, f"Error issuing book: {e}"
 
-    @admin_only
-    @require_verification
+    # @admin_only
+    # @require_verification
     def return_book(self, user_id, book_id):
         query = """
         SELECT issue_id FROM issues_table WHERE user_id = %s AND book_id = %s
@@ -179,28 +187,46 @@ class librarian(services):
 
 
 class student(services):
-    @require_verification
+    # #@require_verification
     def view_shelf(self, user_id, *args):
         query = """SELECT * FROM issues_table WHERE user_id = %s"""
         params = (user_id,)
         result = self.db_connection.fetch_results(query, params)
         if result:
-            query = """SELECT username FROM users_table WHERE user_id = %s"""
+            query = """SELECT COUNT(*) AS count FROM issues_table WHERE user_id = %s"""
             params = (user_id,)
-            user_name = self.db_connection.fetch_results(query, params)[
-                0]['username']
+            book_count = self.db_connection.fetch_results(query, params)[
+                0]['count']
 
-            book_id = result[0]['book_id']
-            query = """SELECT * FROM book_table WHERE book_id = %s"""
-            params = (book_id,)
-            book_details = self.db_connection.fetch_results(query, params)
             return True, {
-                "user_name": user_name,
-                "book_details": book_details[0]
+                "book_count": book_count,
+                "book_details": result
             }
         return False, "Empty shelf."
 
-    @require_verification
+    def issued_books_table(self, user_id):
+        self.user_id = user_id
+        res = self.view_shelf(self.user_id)
+        if res[0]:
+            shelf = []
+            for i in range(res[1]['book_count']):
+                val = res[1]['book_details'][i]
+                book_id = val['book_id']
+                title = self.get_book_details(book_id, 'title')
+                issue_date = val['issue_date']
+                return_date = val['return_date']
+                shelf.append({
+                    "book_id": book_id,
+                    "title": title,
+                    "issue_date": issue_date,
+                    "return_date": return_date
+                })
+
+            return True, res[1]['book_count'], shelf
+        return False, "No issued books found."
+
+    # @require_verification
+
     def reserve_book(self, user_id, book_id, *args):
         query = "SELECT reserve_id FROM reserveBooks WHERE book_id = %s"
         params = (book_id,)
@@ -228,7 +254,16 @@ class student(services):
             except Error as e:
                 return False, f"Error reserving book: {e}"
 
-    @require_verification
+    # #@require_verification
+    def get_reserve_books(self, user_id):
+        query = "SELECT * FROM reserveBooks WHERE user_id = %s"
+        params = (user_id,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            return True, result
+        return False, "No reserved books found."
+
+    # @require_verification
     def get_user_details(self, user_id):
         query = "SELECT username FROM users_table WHERE user_id = %s"
         params = (user_id,)

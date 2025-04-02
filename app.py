@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+from tkinter import ttk
 from databaseQuery import librarian, student, services
 import threading
 import time
@@ -181,7 +182,7 @@ class student_panel(ctk.CTkFrame):
 
 class student_menu(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
-        super().__init__(master)
+        super().__init__(master, width=250, fg_color='#444444')
         self.app = app
         self.master = master
         self.student = student()
@@ -219,7 +220,7 @@ class student_menu(ctk.CTkFrame):
 
 
 class student_dashboard(ctk.CTkFrame):
-    def __init__(self, master, app, user_id,  username,is_verified, user_type):
+    def __init__(self, master, app, user_id,  username, is_verified, user_type):
         super().__init__(master)
         self.app = app
         self.master = master
@@ -273,11 +274,77 @@ class student_view_books_frame(ctk.CTkFrame):
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_rowconfigure(tuple(range(0, 2)), weight=1, uniform='a')
-
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(1, weight=5, uniform='a')
         self.label = ctk.CTkLabel(
             self, text="View Books", font=("Arial", 20))
         self.label.grid(row=0, column=0, pady=20, sticky="n")
+        self.style = ttk.Style(self)
+        self.configure_style()
+        self.table = ttk.Treeview(self, columns=(
+            "Title", 'issue_date', 'return_date', 'Penalty'), show="headings", )
+        self.table.heading("Title", text="Title")
+        self.table.heading("issue_date", text="issued")
+        self.table.heading("return_date", text="returned")
+        self.table.heading("Penalty", text="Penalty")
+
+        self.table.column("Title", width=150)
+        self.table.column("issue_date", width=100, anchor="center")
+        self.table.column("return_date", width=100, anchor="center")
+        self.table.column("Penalty", width=80, anchor="center")
+        self.update_table(self.table)
+        self.table.grid(row=1, column=0, padx=50, pady=20, sticky="ew")
+
+        res = self.student.view_shelf(
+            user_id=self.user_id,
+        )
+        print(res)
+
+    def configure_style(self):
+        """Configures the dark theme for the Treeview"""
+        self.style.theme_use("clam")  # Use 'clam' as the base theme
+
+        # Treeview background, text color, and row height
+        self.style.configure("Treeview",
+                             background="#333333",
+                             foreground="white",
+                             rowheight=25,
+                             fieldbackground="#333333")
+
+        # Selected row color
+        self.style.map("Treeview",
+                       background=[("selected", "#555555")],
+                       foreground=[("selected", "white")])
+
+        # Heading styling
+        self.style.configure("Treeview.Heading",
+                             background="#444444",
+                             foreground="white",
+                             font=("Arial", 10, "bold"),
+                             relief="solid",  # Adds border for heading
+                             borderwidth=1,
+                             )
+        self.style.configure("Bordered.Treeview.Row",
+                             relief="solid",  # Border for each row
+                             borderwidth=1)
+
+    def update_table(self, table):
+        table_children = self.student.issued_books_table(
+            user_id=self.user_id
+        )
+        if table_children[0]:
+            for i in range(table_children[1]):
+                self.table.insert("", "end", values=(
+                    table_children[2][i]['title'],
+                    table_children[2][i]['issue_date'],
+                    table_children[2][i]['return_date'],
+                    # table_children[2][i]['penalty']
+                    0
+                ))
+        else:
+            messagebox.showerror("Error", "No books found!")
+            return
 
 
 if __name__ == "__main__":
