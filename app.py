@@ -2,6 +2,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 from tkinter import ttk
 from databaseQuery import librarian, student, services
+from PIL import Image
 import threading
 import time
 
@@ -11,11 +12,13 @@ class LibraryManagement(ctk.CTk):
         super().__init__()
         self.title("Library Management System")
         self.geometry("700x700")
+        ctk.set_appearance_mode("Dark")
 
         self.container = ctk.CTkFrame(self)
         self.container.pack(fill="both", expand=True)
 
-        self.show_login()
+        # self.show_login()
+        self.login()
 
     def show_login(self):
         for widget in self.container.winfo_children():
@@ -130,8 +133,6 @@ class student_panel(ctk.CTkFrame):
         if res[0]:
             self.username = res[1]
 
-        print(self.username)
-
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=3, uniform='a')
@@ -221,7 +222,7 @@ class student_menu(ctk.CTkFrame):
 
 class student_dashboard(ctk.CTkFrame):
     def __init__(self, master, app, user_id,  username, is_verified, user_type):
-        super().__init__(master)
+        super().__init__(master, bg_color='#aeb6bf')
         self.app = app
         self.master = master
         self.student = student()
@@ -229,23 +230,85 @@ class student_dashboard(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
         self.username = username
-
+       
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_rowconfigure(tuple(range(0, 2)), weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(2, weight=3, uniform='a')
+        self.grid_rowconfigure(3, weight=4, uniform='a')
 
         self.label = ctk.CTkLabel(
-            self, text="Student Dashboard", font=("Arial", 20))
+            self, text="A book is a dream that you hold in your hands. ~Jack", font=("Ubuntu Light", 16),)
         self.label.grid(row=0, column=0, pady=20, sticky="n")
 
         self.label = ctk.CTkLabel(
-            self, text=f"Hey, {self.username}", font=("Arial", 25))
-        self.label.grid(row=1, column=0, pady=20, sticky="n")
+            self, text=f"Hey, {self.username} Welcome Back..!", font=("Trebuchet MS", 22), )
+        self.label.grid(row=1, column=0, padx=10, pady=20, sticky="w")
+
+        self.search_bar = ctk.CTkEntry(
+            self, placeholder_text="Search for books", width=400, height=50, )
+        self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
+
+        self.search_button = ctk.CTkButton(
+            self, text="Search", command=self.search_books)
+        self.search_button.grid(row=2, column=0, padx=5, )
+
+        self.suggestions_label = ctk.CTkLabel(
+            self, text="Suggestions", font=("Arial", 20))
+        self.suggestions_label.grid(
+            row=3, column=0, padx=10, pady=20, sticky="nw")
+
+        self.book_suggestions = book_suggestion_frame(
+            self, self.app, self.user_id, None, self.student.user_type)
+        self.book_suggestions.grid(row=3, column=0, sticky='sw')
+
+    def search_books(self):
+        pass
+
+
+class book_suggestion_frame(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, is_verified, user_type):
+        super().__init__(master,  width=500, height=250)
+        self.app = app
+        self.master = master
+        self.student = student()
+        self.student.is_verified = is_verified
+        self.student.user_type = user_type
+        self.user_id = user_id
+
+        self.grid_columnconfigure((0, 1), weight=1, uniform='a')
+        self.grid_rowconfigure((0), weight=4, )
+        self.grid_rowconfigure((1), weight=1, )
+
+        try:
+            self.image = Image.open("steve.jpg")
+            # self.image.show()
+        except Exception as e:
+            print(f"Error loading image: {e}")
+
+        my_image = ctk.CTkImage(light_image=self.image,
+                                dark_image=self.image, size=(200, 150))
+
+        self.image_label = ctk.CTkLabel(self, image=my_image, text='')
+        # self.image_label.pack()
+        self.image_label.grid(row=0, column=0, pady=20, sticky="news")
+
+        my_image2 = ctk.CTkImage(light_image=self.image,
+                                 dark_image=self.image, size=(200, 150))
+
+        self.image_label2 = ctk.CTkLabel(self, image=my_image2, text='')
+        # self.image_label.pack()
+        self.image_label2.grid(row=0, column=1, padx=10,
+                               pady=10, sticky="news")
+
+        self.book_name = ctk.CTkLabel(self,  text='Steve', font=("Trebuchet MS", 22))
+        self.book_name.grid(row=1, column=0, sticky='n')
 
 
 class reserve_book_frame(ctk.CTkFrame):
-    def __init__(self, master, app, user_id, is_verified, user_type):
-        super().__init__(master)
+    def __init__(self, master, app, user_id, username, is_verified, user_type):
+        super().__init__(master,)
         self.app = app
         self.master = master
         self.student = student()
@@ -263,7 +326,7 @@ class reserve_book_frame(ctk.CTkFrame):
 
 
 class student_view_books_frame(ctk.CTkFrame):
-    def __init__(self, master, app, user_id, is_verified, user_type):
+    def __init__(self, master, app, user_id, username, is_verified, user_type):
         super().__init__(master)
         self.app = app
         self.master = master
@@ -299,7 +362,6 @@ class student_view_books_frame(ctk.CTkFrame):
         res = self.student.view_shelf(
             user_id=self.user_id,
         )
-        print(res)
 
     def configure_style(self):
         """Configures the dark theme for the Treeview"""
@@ -349,4 +411,5 @@ class student_view_books_frame(ctk.CTkFrame):
 
 if __name__ == "__main__":
     app = LibraryManagement()
+
     app.mainloop()
