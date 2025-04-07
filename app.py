@@ -135,7 +135,7 @@ class student_panel(ctk.CTkFrame):
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_columnconfigure(1, weight=3, uniform='a')
+        self.grid_columnconfigure(1, weight=10, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
 
         self.menu = student_menu(
@@ -183,7 +183,7 @@ class student_panel(ctk.CTkFrame):
 
 class student_menu(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
-        super().__init__(master, width=250, fg_color='#444444')
+        super().__init__(master, width=200, fg_color='#444444')
         self.app = app
         self.master = master
         self.student = student()
@@ -199,7 +199,11 @@ class student_menu(ctk.CTkFrame):
             self, text="Student Menu", font=("Arial", 20))
         self.label.grid(row=0, column=0, pady=20, sticky="n")
 
-        # Example button to demonstrate functionality
+        self.dashboard_button = ctk.CTkButton(
+            self, text="Dashboard", command=self.master.show_student_dashboard)
+        self.dashboard_button.grid(
+            row=4, column=0, padx=10, pady=10, sticky="news")
+
         self.view_books_button = ctk.CTkButton(
             self, text="View Books", command=self.master.view_books)
         self.view_books_button.grid(
@@ -209,15 +213,11 @@ class student_menu(ctk.CTkFrame):
             self, text="Reserve Book", command=self.master.reserve_book_dashboard)
         self.reserve_book_button.grid(
             row=2, column=0, padx=10, pady=10, sticky="news")
+
         self.logout_button = ctk.CTkButton(
             self, text="Logout", command=self.master.logout)
         self.logout_button.grid(
             row=3, column=0, padx=10, pady=10, sticky="news")
-
-        self.dashboard_button = ctk.CTkButton(
-            self, text="Dashboard", command=self.master.show_student_dashboard)
-        self.dashboard_button.grid(
-            row=4, column=0, padx=10, pady=10, sticky="news")
 
 
 class student_dashboard(ctk.CTkFrame):
@@ -230,7 +230,7 @@ class student_dashboard(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
         self.username = username
-       
+
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
@@ -250,6 +250,9 @@ class student_dashboard(ctk.CTkFrame):
             self, placeholder_text="Search for books", width=400, height=50, )
         self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
 
+        self.search_bar.bind("<Enter>", self.on_enter)
+        self.search_bar.bind("<Leave>", self.on_leave)
+
         self.search_button = ctk.CTkButton(
             self, text="Search", command=self.search_books)
         self.search_button.grid(row=2, column=0, padx=5, )
@@ -263,8 +266,14 @@ class student_dashboard(ctk.CTkFrame):
             self, self.app, self.user_id, None, self.student.user_type)
         self.book_suggestions.grid(row=3, column=0, sticky='sw')
 
-    def search_books(self):
+    def search_books(self, *args):
         pass
+
+    def on_enter(self, *args):
+        print("Serach bar enter")
+
+    def on_leave(self, *args):
+        print("Serach bar leave")
 
 
 class book_suggestion_frame(ctk.CTkFrame):
@@ -302,7 +311,8 @@ class book_suggestion_frame(ctk.CTkFrame):
         self.image_label2.grid(row=0, column=1, padx=10,
                                pady=10, sticky="news")
 
-        self.book_name = ctk.CTkLabel(self,  text='Steve', font=("Trebuchet MS", 22))
+        self.book_name = ctk.CTkLabel(
+            self,  text='Steve', font=("Trebuchet MS", 22))
         self.book_name.grid(row=1, column=0, sticky='n')
 
 
@@ -405,7 +415,14 @@ class student_view_books_frame(ctk.CTkFrame):
                     0
                 ))
         else:
-            messagebox.showerror("Error", "No books found!")
+            self.table.insert("", "end", values=(
+                ' ',
+                'No books issued',
+                ' ',
+                ' ',
+                # table_children[2][i]['penalty']
+                0
+            ))
             return
 
 

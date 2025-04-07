@@ -92,7 +92,7 @@ class services:
 class librarian(services):
     # @admin_only
     # @require_verification
-    def insert_book(self, title, author, genre, isbn, publisher, published_year, pages):
+    def insert_book(self, title, author, genre, isbn, publisher, published_year, pages, image_id=None):
         query = """
         INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages)
         VALUES (%s, %s, %s, %s, %s, %s, %s)

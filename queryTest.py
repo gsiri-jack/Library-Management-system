@@ -1,4 +1,5 @@
 from databaseQuery import librarian, student
+import json
 
 staff = librarian()
 stu = student()
@@ -39,21 +40,36 @@ stu = student()
 # )
 
 
-stu.reserve_book(
-    user_id="b",
-    book_id=6
+# stu.reserve_book(
+#     user_id="b",
+#     book_id=6
 
-)
+# )
 
-staff.issue_book(
-    user_id="b",
-    book_id=2
-)
+# staff.issue_book(
+#     user_id="b",
+#     book_id=2
+# )
 
 
-res = stu.issued_books_table(
-    user_id="b"
-)
+# res = stu.issued_books_table(
+#     user_id="b"
+# )
 
-for i in range(res[1]):
-    print(res[2][i]['title'])
+# for i in range(res[1]):
+#     print(res[2][i]['title'])
+
+with open("bookdata.json", "r") as file:
+    data = json.load(file)
+
+for entry in data:
+    staff.insert_book(
+        title=entry['title'],
+        author=entry['author'],
+        genre="Fiction",
+        isbn=entry['isbn'],
+        publisher=entry['publisher'],
+        published_year=entry['published_year'],
+        pages=entry['pages'],
+        image_id=entry['image_id']
+    )

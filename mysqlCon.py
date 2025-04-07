@@ -1,5 +1,5 @@
 import pymysql
-
+import json
 from pymysql import Error
 
 
@@ -69,19 +69,3 @@ class MySQLConnection:
             return None
 
 
-# for entry in data:
-#     sql = """
-#     INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages)
-#     VALUES (%s, %s, %s, %s, %s, %s, %s)
-#     """
-#     values = (
-#         entry['title'],
-#         entry['author'],
-#         entry['genre'],
-#         entry['isbn'],
-#         entry['publisher'],
-#         entry['published_year'],
-#         entry['pages']
-#     )
-
-#     db_connection.execute_query(sql, values)
