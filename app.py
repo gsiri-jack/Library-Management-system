@@ -251,9 +251,8 @@ class student_dashboard(ctk.CTkFrame):
             self, placeholder_text="Search for books", width=400, height=50, )
         self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
 
-        self.key = self.search_bar.get()
         self.search_button = ctk.CTkButton(
-            self, text="Search", command=self.search_book(self.key))
+            self, text="Search", command=self.search_books)
         self.search_button.grid(row=2, column=0, padx=5, )
 
         self.suggestions_label = ctk.CTkLabel(
@@ -265,12 +264,22 @@ class student_dashboard(ctk.CTkFrame):
             self, self.app, self.user_id, None, self.student.user_type)
         self.book_suggestions.grid(row=3, column=0, sticky='nesw')
 
-    def search_books(self, key, *args):
-        res = self.student.search_books(key)
+    def search_books(self, *args):
+        # Retrieve the search bar value dynamically
+        key = self.search_bar.get().strip()
+        if not key:
+            messagebox.showerror("Error", "Search field cannot be empty!")
+            return
+
+        # Perform the search
+        res = self.student.search_book_by_title(key)
         if res[0]:
-            print(res[1])
+            for i in range(len(res[1])):
+                book_title = res[1][i]['title']
+                print(f"Book Title: {book_title}")
         else:
-            print("No books found")
+            messagebox.showinfo(
+                "No Results", "No books found matching your query.")
 
 
 class book_suggestion_frame(ctk.CTkFrame):

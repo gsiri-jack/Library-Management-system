@@ -81,22 +81,31 @@ class services:
         return False, "No books found."
 
     def search_book_by_title(self, title):
-        like_clauses = 'OR'.join([
-            f"LOWER(title) LIKE LOWER(%s)" for _ in title.split()])
-        params = [
-            f"%{word}%" for word in title.split()]
+        # Split the title into words and construct the LIKE clauses
+        like_clauses = " OR ".join([
+            "LOWER(title) LIKE %s" for _ in title.split()
+        ])
+        params = [f"%{word.lower()}%" for word in title.split()
+                  ]  # Ensure case-insensitivity
         query = f"SELECT * FROM book_table WHERE {like_clauses}"
+
+        # Execute the query and fetch results
         results = self.db_connection.fetch_results(query, params)
         if results:
             return True, results
         return False, "No books found."
 
     def get_book_details(self, key_name, key_value, columnName):
-        query = f"SELECT * FROM book_table WHERE {key_name} = %s"
+        # Define allowed column names
+        allowed_keys = {"book_id", "image_id", "isbn"}
+        if key_name not in allowed_keys:
+            return False, "Invalid key name."
+
+        query = f"SELECT {columnName} FROM book_table WHERE {key_name} = %s"
         params = (key_value,)
         result = self.db_connection.fetch_results(query, params)
         if result:
-            return result[0][columnName]
+            return True, result[0][columnName]
         return False, "Book not found."
 
 
