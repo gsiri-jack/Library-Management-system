@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from databaseQuery import librarian, student, services
 from PIL import Image
+from random import randint
 import threading
 import time
 
@@ -250,11 +251,9 @@ class student_dashboard(ctk.CTkFrame):
             self, placeholder_text="Search for books", width=400, height=50, )
         self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
 
-        self.search_bar.bind("<Enter>", self.on_enter)
-        self.search_bar.bind("<Leave>", self.on_leave)
-
+        self.key = self.search_bar.get()
         self.search_button = ctk.CTkButton(
-            self, text="Search", command=self.search_books)
+            self, text="Search", command=self.search_book(self.key))
         self.search_button.grid(row=2, column=0, padx=5, )
 
         self.suggestions_label = ctk.CTkLabel(
@@ -264,21 +263,19 @@ class student_dashboard(ctk.CTkFrame):
 
         self.book_suggestions = book_suggestion_frame(
             self, self.app, self.user_id, None, self.student.user_type)
-        self.book_suggestions.grid(row=3, column=0, sticky='sw')
+        self.book_suggestions.grid(row=3, column=0, sticky='nesw')
 
-    def search_books(self, *args):
-        pass
-
-    def on_enter(self, *args):
-        print("Serach bar enter")
-
-    def on_leave(self, *args):
-        print("Serach bar leave")
+    def search_books(self, key, *args):
+        res = self.student.search_books(key)
+        if res[0]:
+            print(res[1])
+        else:
+            print("No books found")
 
 
 class book_suggestion_frame(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
-        super().__init__(master,  width=500, height=250)
+        super().__init__(master,  width=550, height=250)
         self.app = app
         self.master = master
         self.student = student()
@@ -286,34 +283,58 @@ class book_suggestion_frame(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
 
-        self.grid_columnconfigure((0, 1), weight=1, uniform='a')
+        self.grid_columnconfigure((0, 4), weight=1, uniform='a')
         self.grid_rowconfigure((0), weight=4, )
         self.grid_rowconfigure((1), weight=1, )
+        self.img_pathes, self.img_id = self.cover_image_gen()
+        for i in range(0, 6):
+            try:
+                self.image = Image.open(self.img_pathes[i])
+                # self.image.show()
+            except Exception as e:
+                print(f"Error loading image: {e}")
+            if self.image:
+                my_image = ctk.CTkImage(light_image=self.image,
+                                        dark_image=self.image, size=(150, 200))
+                self.book_name = self.get_book_details(self.img_id[i])
+                self.image_label = ctk.CTkButton(
+                    self, image=my_image, text='', command=self.openBook(self.book_name,), fg_color='transparent')
+                # self.image_label.pack()
+                self.image_label.grid(
+                    row=0, column=i, padx=10, pady=20, sticky="news")
 
-        try:
-            self.image = Image.open("steve.jpg")
-            # self.image.show()
-        except Exception as e:
-            print(f"Error loading image: {e}")
+                self.book_label = ctk.CTkLabel(
+                    self, text=self.book_name, font=("Arial", 12))
+                self.book_label.grid(
+                    row=1, column=i, padx=5, pady=5, sticky="news")
 
-        my_image = ctk.CTkImage(light_image=self.image,
-                                dark_image=self.image, size=(200, 150))
+    def get_book_details(self, image_id):
+        book_details = self.student.get_book_details(
+            key_name="image_id",
+            key_value=image_id,
+            columnName='title',
+        )
+        if book_details[0]:
+            size = len(book_details)
+            if size <= 25:
+                return book_details
+            else:
+                book_details = book_details[:25]+'...'
+                return book_details
 
-        self.image_label = ctk.CTkLabel(self, image=my_image, text='')
-        # self.image_label.pack()
-        self.image_label.grid(row=0, column=0, pady=20, sticky="news")
+    def cover_image_gen(self):
+        img = []
+        img_pathes = []
+        while len(img) < 6:
+            val = randint(1001, 1031)
+            if val not in img:
+                img.append(val)
+                img_pathes.append(f"coverpages/{val}.png")
+        return img_pathes, img
 
-        my_image2 = ctk.CTkImage(light_image=self.image,
-                                 dark_image=self.image, size=(200, 150))
-
-        self.image_label2 = ctk.CTkLabel(self, image=my_image2, text='')
-        # self.image_label.pack()
-        self.image_label2.grid(row=0, column=1, padx=10,
-                               pady=10, sticky="news")
-
-        self.book_name = ctk.CTkLabel(
-            self,  text='Steve', font=("Trebuchet MS", 22))
-        self.book_name.grid(row=1, column=0, sticky='n')
+    def openBook(self, book_name):
+        # Implement the logic to open the book
+        pass
 
 
 class reserve_book_frame(ctk.CTkFrame):

@@ -63,7 +63,7 @@ class services:
         query = "SELECT * FROM book_table WHERE 1=1"
         params = []
         if title:
-            query += " AND title LIKE %s"
+            query += " AND  LOWER(title) LIKE LOWER(%s)"
             params.append(f"%{title}%")
         if author:
             query += " AND author LIKE %s"
@@ -80,9 +80,20 @@ class services:
             return True, results
         return False, "No books found."
 
-    def get_book_details(self, book_id, columnName):
-        query = "SELECT * FROM book_table WHERE book_id = %s"
-        params = (book_id,)
+    def search_book_by_title(self, title):
+        like_clauses = 'OR'.join([
+            f"LOWER(title) LIKE LOWER(%s)" for _ in title.split()])
+        params = [
+            f"%{word}%" for word in title.split()]
+        query = f"SELECT * FROM book_table WHERE {like_clauses}"
+        results = self.db_connection.fetch_results(query, params)
+        if results:
+            return True, results
+        return False, "No books found."
+
+    def get_book_details(self, key_name, key_value, columnName):
+        query = f"SELECT * FROM book_table WHERE {key_name} = %s"
+        params = (key_value,)
         result = self.db_connection.fetch_results(query, params)
         if result:
             return result[0][columnName]
