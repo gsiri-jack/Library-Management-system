@@ -1,54 +1,11 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from tkinter import ttk
-from databaseQuery import librarian, student
+from databaseQuery import librarian, student, services
 from PIL import Image
 from random import randint
 import threading
 import time
-import mysql.connector
-
-
-class services:
-    def __init__(self):
-        self.connection = None
-        self.connect_to_database()
-
-    def connect_to_database(self):
-        try:
-            self.connection = mysql.connector.connect(
-                host="your_host",
-                user="your_user",
-                password="your_password",
-                database="your_database",
-                connect_timeout=10
-            )
-            self.cursor = self.connection.cursor(dictionary=True)
-        except Exception as e:
-            print(f"Error connecting to database: {e}")
-            self.connection = None
-
-    def reconnect_if_needed(self):
-        try:
-            if self.connection is None or not self.connection.is_connected():
-                print("Reconnecting to the database...")
-                self.connect_to_database()
-        except Exception as e:
-            print(f"Error during reconnection: {e}")
-
-    def verify_user(self, user_id, password):
-        self.reconnect_if_needed()
-        try:
-            query = "SELECT user_type FROM users WHERE user_id = %s AND password = %s"
-            self.cursor.execute(query, (user_id, password))
-            result = self.cursor.fetchone()
-            if result:
-                return True, result['user_type']
-            else:
-                return False, None
-        except Exception as e:
-            print(f"Error verifying user: {e}")
-            return False, None
 
 
 class LibraryManagement(ctk.CTk):
@@ -61,6 +18,7 @@ class LibraryManagement(ctk.CTk):
         self.container = ctk.CTkFrame(self)
         self.container.pack(fill="both", expand=True)
 
+        # self.show_login()
         self.login()
 
     def show_login(self):
@@ -84,6 +42,9 @@ class LibraryManagement(ctk.CTk):
         login_button.pack(pady=10)
 
     def login(self):
+
+        # For testing purposes
+
         self.user_id = "b"
         self.password = 'b'
 
@@ -145,6 +106,7 @@ class admin_panel(ctk.CTkFrame):
         self.logout_button.place(x=5, y=20)
 
     def create_user(self):
+        # Example functionality for creating a user
         self.admin.create_user(
             user_id="b",
             username="alice",
@@ -172,6 +134,7 @@ class student_panel(ctk.CTkFrame):
         if res[0]:
             self.username = res[1]
 
+        # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=10, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
@@ -179,6 +142,7 @@ class student_panel(ctk.CTkFrame):
         self.menu = student_menu(
             self, app, user_id, is_verified, user_type)
         self.menu.grid(row=0, column=0, sticky="nsew")
+        # self.menu.grid_rowconfigure(0, weight=1)
 
         self.label = ctk.CTkLabel(
             self, text="Student Panel", font=("Arial", 20))
@@ -213,12 +177,15 @@ class student_panel(ctk.CTkFrame):
             widget.destroy()
 
     def create_search_frame(self, search_key=None):
+
+        # Create a new search_book_frame
         self.search_frame = search_book_frame(
             self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type, search_key)
         self.search_frame.grid(row=0, column=1, sticky="nsew")
         self.search_frame.tkraise()
 
     def show_book_frame(self, book_res):
+        # Create a new book_interface_frame
         self.book_interface_frame = book_interface_frame(
             self, self.app, self.user_id, book_res)
         self.book_interface_frame.grid(row=0, column=1, sticky="nsew")
@@ -240,6 +207,7 @@ class student_menu(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
 
+        # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_rowconfigure(tuple(range(0, 11)), weight=1, uniform='a')
 
@@ -278,6 +246,38 @@ class student_dashboard(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
         self.username = username
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(2, weight=3, uniform='a')
+        self.grid_rowconfigure(3, weight=4, uniform='a')
+
+        self.label = ctk.CTkLabel(
+            self, text="A book is a dream that you hold in your hands. ~Jack", font=("Ubuntu Light", 16),)
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+        self.label = ctk.CTkLabel(
+            self, text=f"Hey, {self.username} Welcome Back..!", font=("Trebuchet MS", 22), )
+        self.label.grid(row=1, column=0, padx=10, pady=20, sticky="w")
+
+        self.search_bar = ctk.CTkEntry(
+            self, placeholder_text="Search for books", width=400, height=50, )
+        self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
+
+        self.search_button = ctk.CTkButton(
+            self, text="Search", command=self.show_searhch_frame)
+        self.search_button.grid(row=2, column=0, padx=5, )
+
+        self.suggestions_label = ctk.CTkLabel(
+            self, text="Suggestions", font=("Arial", 20))
+        self.suggestions_label.grid(
+            row=3, column=0, padx=10, pady=20, sticky="nw")
+
+        self.book_suggestions = book_suggestion_frame(
+            self, self.app, self.user_id, None, self.student.user_type)
+        self.book_suggestions.grid(row=3, column=0, sticky='nesw')
 
     def show_searhch_frame(self):
         search_key = self.search_bar.get()
