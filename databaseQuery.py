@@ -219,7 +219,11 @@ class librarian(services):
 
 
 class student(services):
+    def __init__(self):
+        self.db_connection = MySQLConnection()
+        self.db_connection.connect()
     # #@require_verification
+
     def view_shelf(self, user_id, *args):
         query = """SELECT * FROM issues_table WHERE user_id = %s"""
         params = (user_id,)
@@ -263,15 +267,18 @@ class student(services):
         query = "SELECT reserve_id FROM reserveBooks WHERE book_id = %s"
         params = (book_id,)
         result = self.db_connection.fetch_results(query, params)
+        print(result)
 
         if result:
             return False, "Book already reserved."
         else:
             reserve_date = datetime.now()
+            print(reserve_date)
 
             temp = self.db_connection.fetch_results(
                 "SELECT reserve_id FROM reserveBooks")
-            if not temp:
+            print(temp)
+            if len(temp) == 0:
                 self.db_connection.execute_query(
                     "ALTER TABLE reserveBooks AUTO_INCREMENT = 1111")
 
@@ -282,6 +289,7 @@ class student(services):
             params = (user_id, book_id, reserve_date)
             try:
                 self.db_connection.execute_query(query, params)
+                print("Book reserved successfully.")
                 return True, "Book reserved successfully."
             except Error as e:
                 return False, f"Error reserving book: {e}"
@@ -303,3 +311,5 @@ class student(services):
         if result:
             return True, result[0]['username']
         return False, "User not found."
+    
+    

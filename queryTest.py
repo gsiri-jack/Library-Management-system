@@ -59,19 +59,11 @@ stu = student()
 # for i in range(res[1]):
 #     print(res[2][i]['title'])
 
-with open("bookdata.json", "r") as file:
-    data = json.load(file)
+#
 
-for entry in data:
-    staff.insert_book(
-        title=entry['title'],
-        author=entry['author'],
-        genre=entry['genre'],
-        isbn=entry["isbn"],
-        publisher=entry["publisher"],
-        published_year=entry["published_year"],
-        pages=entry["pages"],
-        image_id=entry["image_id"]
-    )
+stu.reserve_book(
+    user_id="b",
+    book_id=7
+)
 # for entry in data:
 #     print(entry['image_id'])

@@ -148,10 +148,6 @@ class student_panel(ctk.CTkFrame):
             self, text="Student Panel", font=("Arial", 20))
         self.label.grid(row=0, column=1, sticky="n")
 
-        self.reserve_book_frame = reserve_book_frame(
-            self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type)
-        self.reserve_book_frame.grid(row=0, column=1, sticky="nsew")
-
         self.view_books_frame = student_view_books_frame(
             self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type)
         self.view_books_frame.grid(row=0, column=1, sticky="nsew")
@@ -170,6 +166,9 @@ class student_panel(ctk.CTkFrame):
         self.student_dashboard.tkraise()
 
     def reserve_book_dashboard(self):
+        self.reserve_book_frame = reserve_book_frame(
+            self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type)
+        self.reserve_book_frame.grid(row=0, column=1, sticky="nsew")
         self.reserve_book_frame.tkraise()
 
     def reset_frame(self, master):
@@ -386,14 +385,17 @@ class reserve_book_frame(ctk.CTkFrame):
 
     def update_table(self, table):
         table_children = self.student.get_reserve_books(self.user_id)
+        print(table_children)
         if table_children[0]:
 
             table_children = table_children[1]
-            book_id = table_children['book_id']
-            status = self.student.check_book_issued(book_id)[0]
+            print(table_children)
+
             for i in range(len(table_children)):
+                book_id = table_children[i]['book_id']
+                status = self.student.check_book_issued(book_id)[0]
                 self.table.insert("", "end", values=(
-                    table_children[i]['title'],
+                    table_children[i]['book_id'],
                     status,
                     'reserved'
                 ))
@@ -433,6 +435,7 @@ class search_book_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.student = student()
+        self.student.user_id = user_id
         self.student.is_verified = is_verified
         self.student.user_type = user_type
         self.user_id = user_id
@@ -456,7 +459,6 @@ class search_book_frame(ctk.CTkFrame):
         self.update_table(self.table)
         self.table.grid(row=0, column=0, padx=50, pady=20, sticky="nsew")
 
-        self.table.bind("<Return>", self.on_item_select)
         self.table.bind("<Double-1>", self.on_item_select)
 
     def on_item_select(self, event):
