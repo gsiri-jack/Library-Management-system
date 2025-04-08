@@ -176,6 +176,14 @@ class student_panel(ctk.CTkFrame):
         for widget in master.winfo_children():
             widget.destroy()
 
+    def create_search_frame(self, search_key=None):
+
+        # Create a new search_book_frame
+        self.search_frame = search_book_frame(
+            self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type, search_key)
+        self.search_frame.grid(row=0, column=1, sticky="nsew")
+        self.search_frame.tkraise()
+
     def logout(self):
         self.student.is_verified = False
         self.student.user_type = None
@@ -252,7 +260,7 @@ class student_dashboard(ctk.CTkFrame):
         self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
 
         self.search_button = ctk.CTkButton(
-            self, text="Search", command=self.search_books)
+            self, text="Search", command=self.show_searhch_frame)
         self.search_button.grid(row=2, column=0, padx=5, )
 
         self.suggestions_label = ctk.CTkLabel(
@@ -264,22 +272,11 @@ class student_dashboard(ctk.CTkFrame):
             self, self.app, self.user_id, None, self.student.user_type)
         self.book_suggestions.grid(row=3, column=0, sticky='nesw')
 
-    def search_books(self, *args):
-        # Retrieve the search bar value dynamically
-        key = self.search_bar.get().strip()
-        if not key:
-            messagebox.showerror("Error", "Search field cannot be empty!")
-            return
-
-        # Perform the search
-        res = self.student.search_book_by_title(key)
-        if res[0]:
-            for i in range(len(res[1])):
-                book_title = res[1][i]['title']
-                print(f"Book Title: {book_title}")
-        else:
-            messagebox.showinfo(
-                "No Results", "No books found matching your query.")
+    def show_searhch_frame(self):
+        search_key = self.search_bar.get()
+        self.master.create_search_frame(
+            search_key=search_key,
+        )
 
 
 class book_suggestion_frame(ctk.CTkFrame):
@@ -307,7 +304,7 @@ class book_suggestion_frame(ctk.CTkFrame):
                                         dark_image=self.image, size=(150, 200))
                 self.book_name = self.get_book_details(self.img_id[i])
                 self.image_label = ctk.CTkButton(
-                    self, image=my_image, text='', command=self.openBook(self.book_name,), fg_color='transparent')
+                    self, image=my_image, text='', command=lambda book_name=self.book_name: self.openBook(book_name), fg_color='transparent')
                 # self.image_label.pack()
                 self.image_label.grid(
                     row=0, column=i, padx=10, pady=20, sticky="news")
@@ -323,6 +320,7 @@ class book_suggestion_frame(ctk.CTkFrame):
             key_value=image_id,
             columnName='title',
         )
+        book_details = book_details[1]
         if book_details[0]:
             size = len(book_details)
             if size <= 25:
@@ -343,7 +341,7 @@ class book_suggestion_frame(ctk.CTkFrame):
 
     def openBook(self, book_name):
         # Implement the logic to open the book
-        pass
+        print(f"Opening book: {book_name}")
 
 
 class reserve_book_frame(ctk.CTkFrame):
@@ -363,6 +361,112 @@ class reserve_book_frame(ctk.CTkFrame):
         self.label = ctk.CTkLabel(
             self, text="Reserve Book", font=("Arial", 20))
         self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
+class search_book_frame(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, username, is_verified, user_type, search_key):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.student = student()
+        self.student.is_verified = is_verified
+        self.student.user_type = user_type
+        self.user_id = user_id
+
+        # Initialize search_key
+        self.search_key = search_key.strip() if search_key else ""
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+
+        self.style = ttk.Style(self)
+        self.configure_style()
+        self.table = ttk.Treeview(self, columns=(
+            "Title", 'author'), show="headings")
+        self.table.heading("Title", text="Title")
+        self.table.heading("author", text="Author")
+
+        self.table.column("Title", width=150)
+        self.table.column("author", width=150)
+        self.update_table(self.table)
+        self.table.grid(row=0, column=0, padx=50, pady=20, sticky="nsew")
+
+        self.table.bind("<Double-1>", self.on_item_select)
+
+    def on_item_select(self, event):
+        selected_item = self.table.selection()
+        if selected_item:
+            item = self.table.item(selected_item)
+            book_title = item['values'][0]
+            book_author = item['values'][1]
+            res = self.student.search_book(
+                title=book_title, author=book_author)
+
+            if res[0]:
+                book_res = {
+                    "title": res[1]['title'],
+                    "author": res[1]['author'],
+                    "genre": res[1]['genre'],
+                    "isbn": res[1]['isbn'],
+                    "publisher": res[1]['publisher'],
+                    "published_year": res[1]['published_year'],
+                    "pages": res[1]['pages'],
+                }
+
+        else:
+            return None, None
+
+    def search_books(self):
+        if not self.search_key:
+            messagebox.showerror("Error", "Search field cannot be empty!")
+            return None
+
+        # Perform the search
+        res = self.student.search_book_by_title(self.search_key)
+        if res[0]:
+            search_results = []
+            for book in res[1]:
+                title = book['title'][:40] + \
+                    '...' if len(book['title']) > 40 else book['title']
+                search_results.append(
+                    {"title": title, "author": book['author']})
+            return search_results
+        else:
+            return None
+
+    def update_table(self, table):
+        search_results = self.search_books()
+        if search_results:
+            for book in search_results:
+                table.insert("", "end", values=(book['title'], book['author']))
+        else:
+            table.insert("", "end", values=("No books found", ""))
+
+    def configure_style(self):
+        """Configures the dark theme for the Treeview"""
+        self.style.theme_use("clam")
+        self.style.configure("Treeview",
+                             background="#333333",
+                             foreground="white",
+                             rowheight=25,
+                             fieldbackground="#333333")
+
+        self.style.map("Treeview",
+                       background=[("selected", "#555555")],
+                       foreground=[("selected", "white")])
+
+        # Heading styling
+        self.style.configure("Treeview.Heading",
+                             background="#333333",
+                             foreground="white",
+                             font=("Arial", 10, "bold"),
+                             relief="solid",
+                             borderwidth=1,
+                             )
+        self.style.configure("Bordered.Treeview.Row",
+                             relief="solid",
+                             borderwidth=1)
 
 
 class student_view_books_frame(ctk.CTkFrame):
@@ -450,7 +554,6 @@ class student_view_books_frame(ctk.CTkFrame):
                 'No books issued',
                 ' ',
                 ' ',
-                # table_children[2][i]['penalty']
                 0
             ))
             return

@@ -67,5 +67,3 @@ class MySQLConnection:
         except Error as e:
             print(f"Error: {e}")
             return None
-
-

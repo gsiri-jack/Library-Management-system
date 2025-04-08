@@ -112,12 +112,13 @@ class services:
 class librarian(services):
     # @admin_only
     # @require_verification
-    def insert_book(self, title, author, genre, isbn, publisher, published_year, pages, image_id=None):
+    def insert_book(self, title, author, genre, isbn, publisher, published_year, pages, image_id):
         query = """
-        INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages,image_id)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
-        params = (title, author, genre, isbn, publisher, published_year, pages)
+        params = (title, author, genre, isbn, publisher,
+                  published_year, pages, image_id)
         try:
             self.db_connection.execute_query(query, params)
             return True, "Book inserted successfully."

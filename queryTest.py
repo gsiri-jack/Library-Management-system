@@ -66,10 +66,12 @@ for entry in data:
     staff.insert_book(
         title=entry['title'],
         author=entry['author'],
-        genre="Fiction",
-        isbn=entry['isbn'],
-        publisher=entry['publisher'],
-        published_year=entry['published_year'],
-        pages=entry['pages'],
-        image_id=entry['image_id']
+        genre=entry['genre'],
+        isbn=entry["isbn"],
+        publisher=entry["publisher"],
+        published_year=entry["published_year"],
+        pages=entry["pages"],
+        image_id=entry["image_id"]
     )
+# for entry in data:
+#     print(entry['image_id'])

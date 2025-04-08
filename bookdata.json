@@ -483,17 +483,6 @@
         "book_num": 42
     },
     {
-        "title": "Think and Grow Rich",
-        "author": "Napoleon Hill",
-        "isbn": "978-1585424337",
-        "publisher": "TarcherPerigee",
-        "published_year": 1937,
-        "genre": "Money & Finance",
-        "pages": 320,
-        "image_id": 1043,
-        "book_num": 43
-    },
-    {
         "title": "The Psychology of Money",
         "author": "Morgan Housel",
         "isbn": "978-0857197689",
