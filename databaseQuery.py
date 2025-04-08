@@ -59,9 +59,12 @@ class services:
         return True, "User has been logged out successfully."
 
     # @require_verification
-    def search_book(self, title=None, author=None, genre=None, isbn=None):
+    def search_book(self, book_id=None, title=None, author=None, genre=None, isbn=None):
         query = "SELECT * FROM book_table WHERE 1=1"
         params = []
+        if book_id:
+            query += " AND book_id = %s"
+            params.append(book_id)
         if title:
             query += " AND  LOWER(title) LIKE LOWER(%s)"
             params.append(f"%{title}%")
@@ -107,6 +110,14 @@ class services:
         if result:
             return True, result[0][columnName]
         return False, "Book not found."
+
+    def check_book_issued(self, book_id):
+        query = "SELECT issue_id FROM issues_table WHERE book_id = %s"
+        params = (book_id,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            return True, "Book is issued."
+        return False, "Book is not issued."
 
 
 class librarian(services):

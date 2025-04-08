@@ -1,11 +1,54 @@
 import customtkinter as ctk
 from tkinter import messagebox
 from tkinter import ttk
-from databaseQuery import librarian, student, services
+from databaseQuery import librarian, student
 from PIL import Image
 from random import randint
 import threading
 import time
+import mysql.connector
+
+
+class services:
+    def __init__(self):
+        self.connection = None
+        self.connect_to_database()
+
+    def connect_to_database(self):
+        try:
+            self.connection = mysql.connector.connect(
+                host="your_host",
+                user="your_user",
+                password="your_password",
+                database="your_database",
+                connect_timeout=10
+            )
+            self.cursor = self.connection.cursor(dictionary=True)
+        except Exception as e:
+            print(f"Error connecting to database: {e}")
+            self.connection = None
+
+    def reconnect_if_needed(self):
+        try:
+            if self.connection is None or not self.connection.is_connected():
+                print("Reconnecting to the database...")
+                self.connect_to_database()
+        except Exception as e:
+            print(f"Error during reconnection: {e}")
+
+    def verify_user(self, user_id, password):
+        self.reconnect_if_needed()
+        try:
+            query = "SELECT user_type FROM users WHERE user_id = %s AND password = %s"
+            self.cursor.execute(query, (user_id, password))
+            result = self.cursor.fetchone()
+            if result:
+                return True, result['user_type']
+            else:
+                return False, None
+        except Exception as e:
+            print(f"Error verifying user: {e}")
+            return False, None
 
 
 class LibraryManagement(ctk.CTk):
@@ -18,7 +61,6 @@ class LibraryManagement(ctk.CTk):
         self.container = ctk.CTkFrame(self)
         self.container.pack(fill="both", expand=True)
 
-        # self.show_login()
         self.login()
 
     def show_login(self):
@@ -42,9 +84,6 @@ class LibraryManagement(ctk.CTk):
         login_button.pack(pady=10)
 
     def login(self):
-
-        # For testing purposes
-
         self.user_id = "b"
         self.password = 'b'
 
@@ -106,7 +145,6 @@ class admin_panel(ctk.CTkFrame):
         self.logout_button.place(x=5, y=20)
 
     def create_user(self):
-        # Example functionality for creating a user
         self.admin.create_user(
             user_id="b",
             username="alice",
@@ -134,7 +172,6 @@ class student_panel(ctk.CTkFrame):
         if res[0]:
             self.username = res[1]
 
-        # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=10, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
@@ -142,7 +179,6 @@ class student_panel(ctk.CTkFrame):
         self.menu = student_menu(
             self, app, user_id, is_verified, user_type)
         self.menu.grid(row=0, column=0, sticky="nsew")
-        # self.menu.grid_rowconfigure(0, weight=1)
 
         self.label = ctk.CTkLabel(
             self, text="Student Panel", font=("Arial", 20))
@@ -177,12 +213,16 @@ class student_panel(ctk.CTkFrame):
             widget.destroy()
 
     def create_search_frame(self, search_key=None):
-
-        # Create a new search_book_frame
         self.search_frame = search_book_frame(
             self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type, search_key)
         self.search_frame.grid(row=0, column=1, sticky="nsew")
         self.search_frame.tkraise()
+
+    def show_book_frame(self, book_res):
+        self.book_interface_frame = book_interface_frame(
+            self, self.app, self.user_id, book_res)
+        self.book_interface_frame.grid(row=0, column=1, sticky="nsew")
+        self.book_interface_frame.tkraise()
 
     def logout(self):
         self.student.is_verified = False
@@ -200,7 +240,6 @@ class student_menu(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
 
-        # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_rowconfigure(tuple(range(0, 11)), weight=1, uniform='a')
 
@@ -239,38 +278,6 @@ class student_dashboard(ctk.CTkFrame):
         self.student.user_type = user_type
         self.user_id = user_id
         self.username = username
-
-        # Configure grid layout
-        self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_rowconfigure(0, weight=1, uniform='a')
-        self.grid_rowconfigure(1, weight=2, uniform='a')
-        self.grid_rowconfigure(2, weight=3, uniform='a')
-        self.grid_rowconfigure(3, weight=4, uniform='a')
-
-        self.label = ctk.CTkLabel(
-            self, text="A book is a dream that you hold in your hands. ~Jack", font=("Ubuntu Light", 16),)
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
-
-        self.label = ctk.CTkLabel(
-            self, text=f"Hey, {self.username} Welcome Back..!", font=("Trebuchet MS", 22), )
-        self.label.grid(row=1, column=0, padx=10, pady=20, sticky="w")
-
-        self.search_bar = ctk.CTkEntry(
-            self, placeholder_text="Search for books", width=400, height=50, )
-        self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
-
-        self.search_button = ctk.CTkButton(
-            self, text="Search", command=self.show_searhch_frame)
-        self.search_button.grid(row=2, column=0, padx=5, )
-
-        self.suggestions_label = ctk.CTkLabel(
-            self, text="Suggestions", font=("Arial", 20))
-        self.suggestions_label.grid(
-            row=3, column=0, padx=10, pady=20, sticky="nw")
-
-        self.book_suggestions = book_suggestion_frame(
-            self, self.app, self.user_id, None, self.student.user_type)
-        self.book_suggestions.grid(row=3, column=0, sticky='nesw')
 
     def show_searhch_frame(self):
         search_key = self.search_bar.get()
@@ -362,6 +369,63 @@ class reserve_book_frame(ctk.CTkFrame):
             self, text="Reserve Book", font=("Arial", 20))
         self.label.grid(row=0, column=0, pady=20, sticky="n")
 
+        self.style = ttk.Style(self)
+        self.configure_style()
+        self.table = ttk.Treeview(self, columns=(
+            "Title", 'status', 'reserved'), show="headings", )
+        self.table.heading("Title", text="Title")
+        self.table.heading("status", text="status")
+        self.table.heading("reserved", text="reserved")
+
+        self.table.column("Title", width=150)
+        self.table.column("status", width=100, anchor="center")
+        self.table.column("reserved", width=100, anchor="center")
+
+        self.update_table(self.table)
+        self.table.grid(row=1, column=0, padx=50, pady=20, sticky="ew")
+
+    def update_table(self, table):
+        table_children = self.student.get_reserve_books(self.user_id)
+        if table_children[0]:
+
+            table_children = table_children[1]
+            book_id = table_children['book_id']
+            status = self.student.check_book_issued(book_id)[0]
+            for i in range(len(table_children)):
+                self.table.insert("", "end", values=(
+                    table_children[i]['title'],
+                    status,
+                    'reserved'
+                ))
+
+    def configure_style(self):
+        """Configures the dark theme for the Treeview"""
+        self.style.theme_use("clam")  # Use 'clam' as the base theme
+
+        # Treeview background, text color, and row height
+        self.style.configure("Treeview",
+                             background="#333333",
+                             foreground="white",
+                             rowheight=25,
+                             fieldbackground="#333333")
+
+        # Selected row color
+        self.style.map("Treeview",
+                       background=[("selected", "#555555")],
+                       foreground=[("selected", "white")])
+
+        # Heading styling
+        self.style.configure("Treeview.Heading",
+                             background="#444444",
+                             foreground="white",
+                             font=("Arial", 10, "bold"),
+                             relief="solid",  # Adds border for heading
+                             borderwidth=1,
+                             )
+        self.style.configure("Bordered.Treeview.Row",
+                             relief="solid",  # Border for each row
+                             borderwidth=1)
+
 
 class search_book_frame(ctk.CTkFrame):
     def __init__(self, master, app, user_id, username, is_verified, user_type, search_key):
@@ -392,6 +456,7 @@ class search_book_frame(ctk.CTkFrame):
         self.update_table(self.table)
         self.table.grid(row=0, column=0, padx=50, pady=20, sticky="nsew")
 
+        self.table.bind("<Return>", self.on_item_select)
         self.table.bind("<Double-1>", self.on_item_select)
 
     def on_item_select(self, event):
@@ -401,18 +466,27 @@ class search_book_frame(ctk.CTkFrame):
             book_title = item['values'][0]
             book_author = item['values'][1]
             res = self.student.search_book(
-                title=book_title, author=book_author)
-
+                book_id=self.search_book_id, author=book_author)
             if res[0]:
+                res = res[1][0]
+                book_id = res['book_id']
+                is_book_issued = self.student.check_book_issued(book_id)[0]
+
                 book_res = {
-                    "title": res[1]['title'],
-                    "author": res[1]['author'],
-                    "genre": res[1]['genre'],
-                    "isbn": res[1]['isbn'],
-                    "publisher": res[1]['publisher'],
-                    "published_year": res[1]['published_year'],
-                    "pages": res[1]['pages'],
+                    "title": res['title'],
+                    "author": res['author'],
+                    "genre": res['genre'],
+                    "isbn": res['isbn'],
+                    "publisher": res['publisher'],
+                    "published_year": res['published_year'],
+                    "pages": res['pages'],
                 }
+                book_res['status'] = is_book_issued
+                book_res['image_id'] = res['image_id']
+                book_res['book_id'] = book_id
+                print(book_res)
+                self.master.show_book_frame(book_res)
+                # print(res[1])
 
         else:
             return None, None
@@ -430,7 +504,8 @@ class search_book_frame(ctk.CTkFrame):
                 title = book['title'][:40] + \
                     '...' if len(book['title']) > 40 else book['title']
                 search_results.append(
-                    {"title": title, "author": book['author']})
+                    {"title": title, "author": book['author'], 'book_id': book['book_id']})
+                self.search_book_id = book['book_id']
             return search_results
         else:
             return None
@@ -467,6 +542,76 @@ class search_book_frame(ctk.CTkFrame):
         self.style.configure("Bordered.Treeview.Row",
                              relief="solid",
                              borderwidth=1)
+
+
+class book_interface_frame(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, book_res):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.user_id = user_id
+        self.student = student()
+        self.student.is_verified = True
+        self.student.user_type = "student"
+        self.student.user_id = user_id
+        self.book_res = book_res
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=3)
+        self.grid_rowconfigure(tuple(range(13)), weight=1, uniform='a')
+
+        self.label = ctk.CTkLabel(
+            self, text="Book Details", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="nesw")
+
+        self.cover_image = Image.open(
+            f"coverpages/{self.book_res['image_id']}.png")
+        self.cover_image = ctk.CTkImage(light_image=self.cover_image,
+                                        dark_image=self.cover_image, size=(250, 330))
+        self.cover_image_label = ctk.CTkLabel(
+            self, image=self.cover_image, text='')
+        self.cover_image_label.grid(
+            row=1, column=0, rowspan=10, padx=10, pady=5, sticky="news")
+        self.title_label = ctk.CTkLabel(
+            self, text=f"Title: {self.book_res['title']}", font=("Arial", 16))
+        self.title_label.grid(row=2, column=1, padx=10, pady=5, sticky="w")
+        self.author_label = ctk.CTkLabel(
+            self, text=f"Author: {self.book_res['author']}", font=("Arial", 16))
+        self.author_label.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+        self.publisher_label = ctk.CTkLabel(
+            self, text=f"Publisher: {self.book_res['publisher']}", font=("Arial", 16))
+        self.publisher_label.grid(
+            row=4, column=1, padx=10, pady=5, sticky="w")
+        self.published_year_label = ctk.CTkLabel(
+            self, text=f"Published Year: {self.book_res['published_year']}", font=("Arial", 16))
+        self.published_year_label.grid(
+            row=5, column=1, padx=10, pady=5, sticky="w")
+
+        self.pages_label = ctk.CTkLabel(
+            self, text=f"Pages: {self.book_res['pages']}", font=("Arial", 16))
+        self.pages_label.grid(row=6, column=1, padx=10, pady=5, sticky="w")
+
+        self.isbn_label = ctk.CTkLabel(
+            self, text=f"ISBN: {self.book_res['isbn']}", font=("Arial", 16))
+        self.isbn_label.grid(row=7, column=1, padx=10, pady=5, sticky="w")
+
+        self.genre_label = ctk.CTkLabel(
+            self, text=f"Genre: {self.book_res['genre']}", font=("Arial", 16))
+        self.genre_label.grid(row=8, column=1, padx=10, pady=5, sticky="w")
+
+        self.status_label = ctk.CTkLabel(
+            self, text=f"Status: {self.book_res['status']}", font=("Arial", 16))
+        self.status_label.grid(row=9, column=1, padx=10, pady=5, sticky="w")
+
+        self.reserve_button = ctk.CTkButton(
+            self, text="Reserve Book", command=self.reserve_book, fg_color='green')
+        self.reserve_button.grid(
+            row=10, column=1, padx=30, pady=5, sticky="news")
+
+    def reserve_book(self):
+        self.student.reserve_book(self.user_id, self.book_res['book_id'])
+        messagebox.showinfo("Success", "Book reserved successfully!")
 
 
 class student_view_books_frame(ctk.CTkFrame):
