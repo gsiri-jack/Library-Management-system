@@ -393,9 +393,16 @@ class reserve_book_frame(ctk.CTkFrame):
 
             for i in range(len(table_children)):
                 book_id = table_children[i]['book_id']
+                title = self.student.get_book_details(
+                    key_name="book_id",
+                    key_value=book_id,
+                    columnName='title',
+                )[1]
+                s_title = title[:40] + \
+                    '...' if len(title) > 40 else title
                 status = self.student.check_book_issued(book_id)[0]
                 self.table.insert("", "end", values=(
-                    table_children[i]['book_id'],
+                    s_title,
                     status,
                     'reserved'
                 ))

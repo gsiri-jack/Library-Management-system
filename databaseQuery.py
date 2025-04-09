@@ -267,17 +267,17 @@ class student(services):
         query = "SELECT reserve_id FROM reserveBooks WHERE book_id = %s"
         params = (book_id,)
         result = self.db_connection.fetch_results(query, params)
-        print(result)
+        # print(result)
 
         if result:
             return False, "Book already reserved."
         else:
             reserve_date = datetime.now()
-            print(reserve_date)
+            # print(reserve_date)
 
             temp = self.db_connection.fetch_results(
                 "SELECT reserve_id FROM reserveBooks")
-            print(temp)
+            # print(temp)
             if len(temp) == 0:
                 self.db_connection.execute_query(
                     "ALTER TABLE reserveBooks AUTO_INCREMENT = 1111")
