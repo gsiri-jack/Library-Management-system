@@ -93,35 +93,48 @@ class admin_panel(ctk.CTkFrame):
         self.admin.is_verified = is_verified
         self.admin.user_type = user_type
         self.admin.user_id = user_id
-
+        self.user_id = user_id
         self.label = ctk.CTkLabel(self, text="Admin Panel", font=("Arial", 20))
-        self.label.pack(pady=20)
+        # Changed from pack to grid
+        self.label.grid(row=0, column=1, sticky="n")
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=9, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
 
-        self.menu = student_menu(
+        self.menu = admin_menu(
             self, app, user_id, is_verified, user_type)
         self.menu.grid(row=0, column=0, sticky="nsew")
-        # self.menu.grid_rowconfigure(0, weight=1)
 
-        self.label = ctk.CTkLabel(
-            self, text="Student Panel", font=("Arial", 20))
-        self.label.grid(row=0, column=1, sticky="n")
+        self.admin_dashboard = admin_dashboard(
+            self, self.app, self.user_id, None, self.admin.is_verified, self.admin.user_type)
+        self.admin_dashboard.grid(row=0, column=1, sticky="nsew")
 
-        self.student_dashboard = student_dashboard(
-            self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type)
-        self.student_dashboard.grid(row=0, column=1, sticky="nsew")
+    def show_admin_dashboard(self):
+        self.admin_dashboard.tkraise()
 
-    def create_user(self):
-        # Example functionality for creating a user
-        self.admin.create_user(
-            user_id="b",
-            username="alice",
-            password="b",
-            user_type="student"
-        )
-        messagebox.showinfo("Success", "User created successfully!")
+    def view_students(self):
+        pass
+
+    def add_book_dashboard(self):
+        pass
+
+    def remove_book_dashboard(self):
+        pass
+
+    def issue_book_dashboard(self):
+        pass
+
+    def return_book_dashboard(self):
+        pass
+
+    def add_student_dashboard(self):
+        pass
+
+    def show_admin_dashboard(self):
+        pass
+
+    def reset_frame(self, master):
+        pass
 
     def logout(self):
         self.admin.is_verified = False
@@ -186,6 +199,29 @@ class admin_menu(ctk.CTkFrame):
             self, text="Logout", command=self.master.logout)
         self.logout_button.grid(
             row=3, column=0, padx=10, pady=10, sticky="news")
+
+
+class admin_dashboard(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, username, is_verified, user_type):
+        super().__init__(master, bg_color='#aeb6bf')
+        self.app = app
+        self.master = master
+        self.admin = librarian()
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = user_id
+        self.username = username
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(2, weight=3, uniform='a')
+        self.grid_rowconfigure(3, weight=4, uniform='a')
+
+        self.label = ctk.CTkLabel(
+            self, text="Admin Dashboard", font=("Ubuntu Light", 16),)
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
 
 
 class student_panel(ctk.CTkFrame):
