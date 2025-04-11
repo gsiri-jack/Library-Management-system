@@ -113,7 +113,9 @@ class admin_panel(ctk.CTkFrame):
         self.admin_dashboard.tkraise()
 
     def view_students(self):
-        pass
+        self.view_students_frame = view_students_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.view_students_frame.grid(row=0, column=0, sticky="nsew")
 
     def add_book_dashboard(self):
         pass
@@ -141,6 +143,82 @@ class admin_panel(ctk.CTkFrame):
         self.admin.user_type = None
         self.app.show_login()
 
+
+class view_students_frame(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, is_verified, user_type):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.admin = librarian()
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = user_id
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(0, weight=3, uniform='a')
+        self.grid_rowconfigure(1, weight=6, uniform='a')
+
+        self.label = ctk.CTkLabel(
+            self, text="View Students", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+        self.search_bar = ctk.CTkEntry(
+            self, placeholder_text="Search for books", width=400, height=50, )
+        self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
+
+        self.search_button = ctk.CTkButton(
+            self, text="Search", command=self.reset_view_studetnts_frame)
+        self.search_button.grid(row=2, column=0, padx=5, )
+
+        # Create a Treeview widget to display student data
+        self.style = ttk.Style(self)
+        self.configure_style()
+        self.table = ttk.Treeview(self, columns=(
+            "Student ID", 'Name', 'Email', 'Phone'), show="headings")
+        self.table.heading("Student ID", text="Student ID")
+        self.table.heading("Name", text="Name")
+        self.table.heading("Email", text="Email")
+        self.table.heading("Phone", text="Phone")
+
+        # Configure column widths
+        self.table.column("Student ID", width=100)
+        self.table.column("Name", width=150)
+        self.table.column("Email", width=150)
+        self.table.column("Phone", width=100)
+
+        # Populate the table with student data
+        self.update_table(self.table)
+        self.table.grid(row=1, column=0, padx=50, pady=20, sticky="ew")
+
+    def configure_style(self):
+        """Configures the dark theme for the Treeview"""
+        self.style.theme_use("clam")  # Use 'clam' as the base theme
+
+        # Treeview background, text color, and row height
+        self.style.configure("Treeview",
+                             background="#333333",
+                             foreground="white",
+                             rowheight=25,
+                             fieldbackground="#333333")
+
+        # Selected row color
+        self.style.map("Treeview",
+                       background=[("selected", "#555555")],
+                       foreground=[("selected", "white")])
+
+        # Heading styling
+        self.style.configure("Treeview.Heading",
+                             background="#444444",
+                             foreground="white",)
+
+    def reset_view_studetnts_frame(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+            
+    def update_table(self, table):
+        pass
 
 class admin_menu(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
