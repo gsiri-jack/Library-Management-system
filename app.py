@@ -45,8 +45,8 @@ class LibraryManagement(ctk.CTk):
 
         # For testing purposes
 
-        self.user_id = "b"
-        self.password = 'b'
+        self.user_id = "prime"
+        self.password = 'prime'
 
         service = services()
         verify_user, user_type = service.verify_user(
@@ -96,14 +96,22 @@ class admin_panel(ctk.CTkFrame):
 
         self.label = ctk.CTkLabel(self, text="Admin Panel", font=("Arial", 20))
         self.label.pack(pady=20)
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=9, uniform='a')
+        self.grid_rowconfigure(0, weight=1, uniform='a')
 
-        self.create_user_button = ctk.CTkButton(
-            self, text="Create User", command=self.create_user)
-        self.create_user_button.pack(pady=10)
+        self.menu = student_menu(
+            self, app, user_id, is_verified, user_type)
+        self.menu.grid(row=0, column=0, sticky="nsew")
+        # self.menu.grid_rowconfigure(0, weight=1)
 
-        self.logout_button = ctk.CTkButton(
-            self, text="Logout", command=self.logout)
-        self.logout_button.place(x=5, y=20)
+        self.label = ctk.CTkLabel(
+            self, text="Student Panel", font=("Arial", 20))
+        self.label.grid(row=0, column=1, sticky="n")
+
+        self.student_dashboard = student_dashboard(
+            self, self.app, self.user_id, self.username, self.student.is_verified, self.student.user_type)
+        self.student_dashboard.grid(row=0, column=1, sticky="nsew")
 
     def create_user(self):
         # Example functionality for creating a user
@@ -121,6 +129,65 @@ class admin_panel(ctk.CTkFrame):
         self.app.show_login()
 
 
+class admin_menu(ctk.CTkFrame):
+    def __init__(self, master, app, user_id, is_verified, user_type):
+        super().__init__(master, width=200, fg_color='#444444')
+        self.app = app
+        self.master = master
+        self.admin = librarian()
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = user_id
+
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_rowconfigure(tuple(range(0, 11)), weight=1, uniform='a')
+
+        self.label = ctk.CTkLabel(
+            self, text="Admin Menu", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+        self.dashboard_button = ctk.CTkButton(
+            self, text="Dashboard", command=self.master.show_admin_dashboard)
+        self.dashboard_button.grid(
+            row=4, column=0, padx=10, pady=10, sticky="news")
+
+        self.view_students_button = ctk.CTkButton(
+            self, text="View students", command=self.master.view_students)
+        self.view_students_button.grid(
+            row=1, column=0, padx=10, pady=10, sticky="news")
+
+        self.add_book_button = ctk.CTkButton(
+            self, text="Add Book", command=self.master.add_book_dashboard)
+        self.add_book_button.grid(
+            row=2, column=0, padx=10, pady=10, sticky="news")
+
+        self.remove_book_button = ctk.CTkButton(
+            self, text="Remove Book", command=self.master.remove_book_dashboard)
+        self.remove_book_button.grid(
+            row=2, column=0, padx=10, pady=10, sticky="news")
+
+        self.issue_book_button = ctk.CTkButton(
+            self, text="Issue Book", command=self.master.issue_book_dashboard)
+        self.issue_book_button.grid(
+            row=2, column=0, padx=10, pady=10, sticky="news")
+
+        self.return_book_button = ctk.CTkButton(
+            self, text="Return Book", command=self.master.return_book_dashboard)
+        self.return_book_button.grid(
+            row=2, column=0, padx=10, pady=10, sticky="news")
+
+        self.add_student_button = ctk.CTkButton(
+            self, text="Add user", command=self.master.add_student_dashboard)
+        self.add_student_button.grid(
+            row=2, column=0, padx=10, pady=10, sticky="news")
+
+        self.logout_button = ctk.CTkButton(
+            self, text="Logout", command=self.master.logout)
+        self.logout_button.grid(
+            row=3, column=0, padx=10, pady=10, sticky="news")
+
+
 class student_panel(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
         super().__init__(master)
@@ -136,7 +203,7 @@ class student_panel(ctk.CTkFrame):
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_columnconfigure(1, weight=10, uniform='a')
+        self.grid_columnconfigure(1, weight=9, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
 
         self.menu = student_menu(
@@ -362,7 +429,8 @@ class reserve_book_frame(ctk.CTkFrame):
 
         # Configure grid layout
         self.grid_columnconfigure(0, weight=1, uniform='a')
-        self.grid_rowconfigure(tuple(range(0, 2)), weight=1, uniform='a')
+        self.grid_rowconfigure(tuple(range(0, 1)), weight=1, uniform='a')
+        self.grid_rowconfigure((1), weight=6, uniform='a')
 
         self.label = ctk.CTkLabel(
             self, text="Reserve Book", font=("Arial", 20))
@@ -381,15 +449,27 @@ class reserve_book_frame(ctk.CTkFrame):
         self.table.column("reserved", width=100, anchor="center")
 
         self.update_table(self.table)
-        self.table.grid(row=1, column=0, padx=50, pady=20, sticky="ew")
+        self.table.grid(row=1, column=0, padx=50, pady=20, sticky="news")
+        self.table.bind("<Double-1>", self.on_item_select)
+
+    def on_item_select(self, event):
+
+        region = self.table.identify_region(event.x, event.y)
+        print(region)
+        if region == "cell":
+            column = self.table.identify_column(event.x)
+            item = self.table.identify_row(event.y)
+            item_values = self.table.item(item, "values")
+            print(
+                f"Selected item: {item}, Column: {column}, Values: {item_values}")
 
     def update_table(self, table):
         table_children = self.student.get_reserve_books(self.user_id)
-        print(table_children)
+        # print(table_children)
         if table_children[0]:
 
             table_children = table_children[1]
-            print(table_children)
+            # print(table_children)
 
             for i in range(len(table_children)):
                 book_id = table_children[i]['book_id']

@@ -67,3 +67,10 @@ stu.reserve_book(
 )
 # for entry in data:
 #     print(entry['image_id'])
+
+staff.create_user(
+    user_id="prime",
+    password="prime",
+    username="prime",
+    user_type='admin',
+)
