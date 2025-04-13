@@ -115,7 +115,7 @@ class admin_panel(ctk.CTkFrame):
     def view_students(self):
         self.view_students_frame = view_students_frame(
             self, self.app, self.user_id, is_verified=True, user_type="admin")
-        self.view_students_frame.grid(row=0, column=0, sticky="nsew")
+        self.view_students_frame.grid(row=0, column=1, sticky="nsew")
 
     def add_book_dashboard(self):
         pass
@@ -219,7 +219,10 @@ class view_students_frame(ctk.CTkFrame):
             
     def update_table(self, table):
         pass
-
+class add_book_dashboard(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, usertype):
+        super().__init__(master)
+    
 class admin_menu(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
         super().__init__(master, width=200, fg_color='#444444')
