@@ -170,7 +170,12 @@ class admin_panel(ctk.CTkFrame):
         print(self.add_student_frame)
 
     def show_admin_dashboard(self):
-        pass
+        if (self.admin_dashboard != None):
+            self.admin_dashboard.destroy()
+        self.admin_dashboard = add_student_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.admin_dashboard.grid(row=0, column=1, sticky="nsew")
+        print(self.admin_dashboard)
 
     def reset_frame(self, master):
         pass
@@ -188,7 +193,7 @@ class view_students_frame(ctk.CTkFrame):
         self.master = master
         self.admin = librarian()
         self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type        
+        self.master.admin.user_type = user_type
         self.user_id = user_id
 
         # Configure grid layout
@@ -265,7 +270,7 @@ class add_book_frame(ctk.CTkFrame):
         self.master = master
         self.userid = userid
         self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type        
+        self.master.admin.user_type = user_type
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -280,7 +285,7 @@ class remove_book_frame(ctk.CTkFrame):
         self.master = master
         self.userid = userid
         self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type        
+        self.master.admin.user_type = user_type
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -295,7 +300,7 @@ class issue_book_frame(ctk.CTkFrame):
         self.master = master
         self.userid = userid
         self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type        
+        self.master.admin.user_type = user_type
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -310,7 +315,7 @@ class return_book_frame(ctk.CTkFrame):
         self.master = master
         self.userid = userid
         self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type        
+        self.master.admin.user_type = user_type
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
