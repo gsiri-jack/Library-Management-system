@@ -94,6 +94,15 @@ class admin_panel(ctk.CTkFrame):
         self.admin.user_type = user_type
         self.admin.user_id = user_id
         self.user_id = user_id
+
+        # Initialize view_students_frame to None
+        self.view_students_frame = None
+        self.add_book_frame = None
+        self.remove_book_frame = None
+        self.issue_book_frame = None
+        self.return_book_frame = None
+        self.add_student_frame = None
+
         self.label = ctk.CTkLabel(self, text="Admin Panel", font=("Arial", 20))
         # Changed from pack to grid
         self.label.grid(row=0, column=1, sticky="n")
@@ -113,24 +122,52 @@ class admin_panel(ctk.CTkFrame):
         self.admin_dashboard.tkraise()
 
     def view_students(self):
+        if (self.view_students_frame != None):
+            self.view_students_frame.destroy()
         self.view_students_frame = view_students_frame(
             self, self.app, self.user_id, is_verified=True, user_type="admin")
         self.view_students_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.view_students_frame)
 
     def add_book_dashboard(self):
-        pass
+        if (self.add_book_frame != None):
+            self.add_book_frame.destroy()
+        self.add_book_frame = add_book_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.add_book_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.add_book_frame)
 
     def remove_book_dashboard(self):
-        pass
+        if (self.remove_book_frame != None):
+            self.remove_book_frame.destroy()
+        self.remove_book_frame = remove_book_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.remove_book_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.remove_book_frame)
 
     def issue_book_dashboard(self):
-        pass
+        if (self.issue_book_frame != None):
+            self.issue_book_frame.destroy()
+        self.issue_book_frame = issue_book_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.issue_book_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.issue_book_frame)
 
     def return_book_dashboard(self):
-        pass
+        if (self.return_book_frame != None):
+            self.return_book_frame.destroy()
+        self.return_book_frame = return_book_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.return_book_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.return_book_frame)
 
     def add_student_dashboard(self):
-        pass
+        if (self.add_student_frame != None):
+            self.add_student_frame.destroy()
+        self.add_student_frame = add_student_frame(
+            self, self.app, self.user_id, is_verified=True, user_type="admin")
+        self.add_student_frame.grid(row=0, column=1, sticky="nsew")
+        print(self.add_student_frame)
 
     def show_admin_dashboard(self):
         pass
@@ -216,13 +253,86 @@ class view_students_frame(ctk.CTkFrame):
     def reset_view_studetnts_frame(self):
         for widget in self.winfo_children():
             widget.destroy()
-            
+
     def update_table(self, table):
         pass
-class add_book_dashboard(ctk.CTkFrame):
-    def __init__(self, master, app, userid, is_verified, usertype):
+
+
+class add_book_frame(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, user_type):
         super().__init__(master)
-    
+        self.app = app
+        self.master = master
+        self.userid = userid
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = userid
+
+        self.label = ctk.CTkLabel(
+            self, text="Add Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
+class remove_book_frame(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, user_type):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.userid = userid
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = userid
+
+        self.label = ctk.CTkLabel(
+            self, text="remove Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
+class issue_book_frame(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, user_type):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.userid = userid
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = userid
+
+        self.label = ctk.CTkLabel(
+            self, text="issue Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
+class return_book_frame(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, user_type):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.userid = userid
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = userid
+
+        self.label = ctk.CTkLabel(
+            self, text="return Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
+class add_student_frame(ctk.CTkFrame):
+    def __init__(self, master, app, userid, is_verified, user_type):
+        super().__init__(master)
+        self.app = app
+        self.master = master
+        self.userid = userid
+        self.admin.is_verified = is_verified
+        self.admin.user_type = user_type
+        self.user_id = userid
+
+        self.label = ctk.CTkLabel(
+            self, text="add_student_frame", font=("Arial", 20))
+        self.label.grid(row=0, column=0, pady=20, sticky="n")
+
+
 class admin_menu(ctk.CTkFrame):
     def __init__(self, master, app, user_id, is_verified, user_type):
         super().__init__(master, width=200, fg_color='#444444')
