@@ -187,8 +187,8 @@ class view_students_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.admin = librarian()
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type        
         self.user_id = user_id
 
         # Configure grid layout
@@ -264,8 +264,8 @@ class add_book_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.userid = userid
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type        
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -279,8 +279,8 @@ class remove_book_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.userid = userid
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type        
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -294,8 +294,8 @@ class issue_book_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.userid = userid
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type        
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -309,8 +309,8 @@ class return_book_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.userid = userid
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type        
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -324,8 +324,8 @@ class add_student_frame(ctk.CTkFrame):
         self.app = app
         self.master = master
         self.userid = userid
-        self.admin.is_verified = is_verified
-        self.admin.user_type = user_type
+        self.master.admin.is_verified = is_verified
+        self.master.admin.user_type = user_type
         self.user_id = userid
 
         self.label = ctk.CTkLabel(
@@ -354,42 +354,42 @@ class admin_menu(ctk.CTkFrame):
         self.dashboard_button = ctk.CTkButton(
             self, text="Dashboard", command=self.master.show_admin_dashboard)
         self.dashboard_button.grid(
-            row=4, column=0, padx=10, pady=10, sticky="news")
+            row=1, column=0, padx=10, pady=10, sticky="news")
 
         self.view_students_button = ctk.CTkButton(
             self, text="View students", command=self.master.view_students)
         self.view_students_button.grid(
-            row=1, column=0, padx=10, pady=10, sticky="news")
+            row=2, column=0, padx=10, pady=10, sticky="news")
 
         self.add_book_button = ctk.CTkButton(
             self, text="Add Book", command=self.master.add_book_dashboard)
         self.add_book_button.grid(
-            row=2, column=0, padx=10, pady=10, sticky="news")
+            row=3, column=0, padx=10, pady=10, sticky="news")
 
         self.remove_book_button = ctk.CTkButton(
             self, text="Remove Book", command=self.master.remove_book_dashboard)
         self.remove_book_button.grid(
-            row=2, column=0, padx=10, pady=10, sticky="news")
+            row=4, column=0, padx=10, pady=10, sticky="news")
 
         self.issue_book_button = ctk.CTkButton(
             self, text="Issue Book", command=self.master.issue_book_dashboard)
         self.issue_book_button.grid(
-            row=2, column=0, padx=10, pady=10, sticky="news")
+            row=5, column=0, padx=10, pady=10, sticky="news")
 
         self.return_book_button = ctk.CTkButton(
             self, text="Return Book", command=self.master.return_book_dashboard)
         self.return_book_button.grid(
-            row=2, column=0, padx=10, pady=10, sticky="news")
+            row=6, column=0, padx=10, pady=10, sticky="news")
 
         self.add_student_button = ctk.CTkButton(
             self, text="Add user", command=self.master.add_student_dashboard)
         self.add_student_button.grid(
-            row=2, column=0, padx=10, pady=10, sticky="news")
+            row=7, column=0, padx=10, pady=10, sticky="news")
 
         self.logout_button = ctk.CTkButton(
             self, text="Logout", command=self.master.logout)
         self.logout_button.grid(
-            row=3, column=0, padx=10, pady=10, sticky="news")
+            row=8, column=0, padx=10, pady=10, sticky="news")
 
 
 class admin_dashboard(ctk.CTkFrame):
