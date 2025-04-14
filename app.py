@@ -133,7 +133,7 @@ class admin_panel(ctk.CTkFrame):
         if (self.add_book_frame != None):
             self.add_book_frame.destroy()
         self.add_book_frame = add_book_frame(
-            self, self.app, self.user_id, is_verified=True, user_type="admin")
+            self, self.app, self.admin, self.user_id, is_verified=True, user_type="admin")
         self.add_book_frame.grid(row=0, column=1, sticky="nsew")
         print(self.add_book_frame)
 
@@ -211,7 +211,7 @@ class view_students_frame(ctk.CTkFrame):
         self.search_bar.grid(row=2, column=0, pady=10, sticky="n")
 
         self.search_button = ctk.CTkButton(
-            self, text="Search", command=self.reset_view_studetnts_frame)
+            self, text="Search", command=self.refresh_table_with_search)
         self.search_button.grid(row=2, column=0, padx=5, )
 
         # Create a Treeview widget to display student data
@@ -259,23 +259,177 @@ class view_students_frame(ctk.CTkFrame):
         for widget in self.winfo_children():
             widget.destroy()
 
+    def refresh_table_with_search(self):
+        """Refresh the table with student details based on the search query."""
+        search_query = self.search_bar.get().strip()
+        if search_query == '' or search_query == ' ':
+            for row in self.table.get_children():
+                self.table.delete(row)
+            student_details = self.admin.get_all_users()
+            if student_details[0]:
+                student_details = student_details[1]
+                for student in student_details:
+                    self.table.insert("", "end", values=(
+                        student['user_id'],
+                        student['username'],
+                        'gjack@g',
+                        900,
+                    ))
+        # Clear existing table data
+        else:
+            for row in self.table.get_children():
+                self.table.delete(row)
+
+            # Fetch student details based on the search query
+            student_details = self.admin.get_student_details_by_username(
+                search_query)
+            if student_details[0]:
+                print(student_details)
+                student_details = student_details[1]
+                for student in student_details:
+                    self.table.insert("", "end", values=(
+                        student['user_id'],
+                        student['username'],
+                        'gjack@g',
+                        900,
+
+                    ))
+            else:
+                messagebox.showinfo(
+                    "Info", "No student found with the given username.")
+
     def update_table(self, table):
-        pass
+        # search_query = self.search_bar.get().strip()
+        for row in self.table.get_children():
+            self.table.delete(row)
+        student_details = self.admin.get_all_users()
+        if student_details[0]:
+            student_details = student_details[1]
+            for student in student_details:
+                self.table.insert("", "end", values=(
+                    student['user_id'],
+                    student['username'],
+                    'gjack@g',
+                    900,
+                ))
 
 
 class add_book_frame(ctk.CTkFrame):
-    def __init__(self, master, app, userid, is_verified, user_type):
+    def __init__(self, master, app, admin, userid, is_verified, user_type):
         super().__init__(master)
         self.app = app
         self.master = master
-        self.userid = userid
-        self.master.admin.is_verified = is_verified
-        self.master.admin.user_type = user_type
+        self.admin = admin  # Use the injected admin instance
         self.user_id = userid
 
-        self.label = ctk.CTkLabel(
-            self, text="Add Book", font=("Arial", 20))
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(tuple(range(8)), weight=1, uniform='a')
+
+        # Title
+        self.title_label = ctk.CTkLabel(
+            self, text="Title:", font=("Arial", 14))
+        self.title_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.title_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter book title")
+        self.title_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
+
+        # Author
+        self.author_label = ctk.CTkLabel(
+            self, text="Author:", font=("Arial", 14))
+        self.author_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.author_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter author name")
+        self.author_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # ISBN
+        self.isbn_label = ctk.CTkLabel(self, text="ISBN:", font=("Arial", 14))
+        self.isbn_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
+        self.isbn_entry = ctk.CTkEntry(self, placeholder_text="Enter ISBN")
+        self.isbn_entry.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+
+        # Publisher
+        self.publisher_label = ctk.CTkLabel(
+            self, text="Publisher:", font=("Arial", 14))
+        self.publisher_label.grid(
+            row=3, column=0, padx=10, pady=10, sticky="e")
+        self.publisher_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter publisher name")
+        self.publisher_entry.grid(
+            row=3, column=1, padx=10, pady=10, sticky="w")
+
+        # Published Year
+        self.published_year_label = ctk.CTkLabel(
+            self, text="Published Year:", font=("Arial", 14))
+        self.published_year_label.grid(
+            row=4, column=0, padx=10, pady=10, sticky="e")
+        self.published_year_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter published year")
+        self.published_year_entry.grid(
+            row=4, column=1, padx=10, pady=10, sticky="w")
+
+        # Genre
+        self.genre_label = ctk.CTkLabel(
+            self, text="Genre:", font=("Arial", 14))
+        self.genre_label.grid(row=5, column=0, padx=10, pady=10, sticky="e")
+        self.genre_entry = ctk.CTkEntry(self, placeholder_text="Enter genre")
+        self.genre_entry.grid(row=5, column=1, padx=10, pady=10, sticky="w")
+
+        # Image ID
+        self.image_id_label = ctk.CTkLabel(
+            self, text="Image ID:", font=("Arial", 14))
+        self.image_id_label.grid(row=6, column=0, padx=10, pady=10, sticky="e")
+        self.image_id_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter image ID")
+        self.image_id_entry.grid(row=6, column=1, padx=10, pady=10, sticky="w")
+
+        # Pages
+        self.pages_label = ctk.CTkLabel(
+            self, text="Pages:", font=("Arial", 14))
+        self.pages_label.grid(row=7, column=0, padx=10, pady=10, sticky="e")
+        self.pages_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter number of pages")
+        self.pages_entry.grid(row=7, column=1, padx=10, pady=10, sticky="w")
+
+        # Submit Button
+        self.submit_button = ctk.CTkButton(
+            self, text="Add Book", command=self.add_book_to_database)
+        self.submit_button.grid(row=8, column=0, columnspan=2, pady=20)
+
+    def add_book_to_database(self):
+        """Add the book to the database and show a status message."""
+        book_details = {
+            "title": self.title_entry.get().strip(),
+            "author": self.author_entry.get().strip(),
+            "isbn": self.isbn_entry.get().strip(),
+            "publisher": self.publisher_entry.get().strip(),
+            "published_year": self.published_year_entry.get().strip(),
+            "genre": self.genre_entry.get().strip(),
+            "image_id": self.image_id_entry.get().strip(),
+            "pages": self.pages_entry.get().strip(),
+        }
+
+        # Validate input
+        if not all(book_details.values()):
+            messagebox.showerror("Error", "All fields are required!")
+            return
+
+        # Add book to the database
+        result = self.admin.insert_book(
+            book_details['title'], book_details["author"], book_details['genre'],
+            book_details["isbn"], book_details['publisher'], book_details['published_year'], book_details['pages'],
+            book_details['image_id']
+        )
+        if result[0]:  # Assuming the method returns a tuple (success, message)
+            messagebox.showinfo("Success", "Book added successfully!")
+            # Clear the form
+            for entry in [self.title_entry, self.author_entry, self.isbn_entry,
+                          self.publisher_entry, self.published_year_entry,
+                          self.genre_entry, self.image_id_entry, self.pages_entry]:
+                entry.delete(0, "end")
+        else:
+            messagebox.showerror("Error", f"Failed to add book: {result[1]}")
 
 
 class remove_book_frame(ctk.CTkFrame):

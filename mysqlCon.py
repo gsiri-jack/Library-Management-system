@@ -67,3 +67,10 @@ class MySQLConnection:
         except Error as e:
             print(f"Error: {e}")
             return None
+
+
+conn = MySQLConnection()
+conn.connect()
+res = conn.fetch_results("SELECT * FROM book_table")
+print(res)
+conn.disconnect()

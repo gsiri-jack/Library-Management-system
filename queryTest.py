@@ -61,16 +61,18 @@ stu = student()
 
 #
 
-stu.reserve_book(
-    user_id="b",
-    book_id=7
-)
+# stu.reserve_book(
+#     user_id="b",
+#     book_id=7
+# )
 # for entry in data:
 #     print(entry['image_id'])
 
-staff.create_user(
-    user_id="prime",
-    password="prime",
-    username="prime",
-    user_type='admin',
-)
+# staff.create_user(
+#     user_id="prime",
+#     password="prime",
+#     username="prime",
+#     user_type='admin',
+# )
+
+staff

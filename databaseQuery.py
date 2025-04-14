@@ -217,6 +217,21 @@ class librarian(services):
         else:
             return False, "No record found for this issue."
 
+    def get_student_details_by_username(self, username):
+        query = "SELECT user_id, username, user_type FROM users_table WHERE username = %s"
+        params = (username,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            return True, result
+        return False, "User not found."
+
+    def get_all_users(self):
+        query = "SELECT user_id, username, user_type FROM users_table WHERE user_type = 'student'"
+        result = self.db_connection.fetch_results(query)
+        if result:
+            return True, result
+        return False, "No users found."
+
 
 class student(services):
     def __init__(self):
@@ -311,5 +326,3 @@ class student(services):
         if result:
             return True, result[0]['username']
         return False, "User not found."
-    
-    
