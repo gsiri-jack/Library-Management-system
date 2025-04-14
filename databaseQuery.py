@@ -197,7 +197,7 @@ class librarian(services):
             self.db_connection.execute_query(query, params)
             return True, "User created successfully."
         except Error as e:
-            return False, f"Error creating user: {e}"
+            return False, f"{e}"
 
     # @admin_only
     # @require_verification

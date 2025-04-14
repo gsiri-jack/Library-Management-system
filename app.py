@@ -774,9 +774,85 @@ class add_student_frame(ctk.CTkFrame):
         self.master.admin.user_type = user_type
         self.user_id = userid
 
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(tuple(range(5)), weight=1, uniform='a')
+
+        # Title Label
         self.label = ctk.CTkLabel(
-            self, text="add_student_frame", font=("Arial", 20))
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
+            self, text="Add Student", font=("Arial", 20))
+        self.label.grid(row=0, column=0, columnspan=2, pady=20, sticky="n")
+
+        # User ID Entry
+        self.user_id_label = ctk.CTkLabel(
+            self, text="User ID:", font=("Arial", 14))
+        self.user_id_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.user_id_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter User ID")
+        self.user_id_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # Username Entry
+        self.username_label = ctk.CTkLabel(
+            self, text="Username:", font=("Arial", 14))
+        self.username_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
+        self.username_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Username")
+        self.username_entry.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+
+        # Password Entry
+        self.password_label = ctk.CTkLabel(
+            self, text="Password:", font=("Arial", 14))
+        self.password_label.grid(row=3, column=0, padx=10, pady=10, sticky="e")
+        self.password_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Password", show="*")
+        self.password_entry.grid(row=3, column=1, padx=10, pady=10, sticky="w")
+
+        # User Type Entry
+        self.user_type_label = ctk.CTkLabel(
+            self, text="User Type:", font=("Arial", 14))
+        self.user_type_label.grid(
+            row=4, column=0, padx=10, pady=10, sticky="e")
+        self.user_type_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter User Type")
+        self.user_type_entry.grid(
+            row=4, column=1, padx=10, pady=10, sticky="w")
+
+        # Create User button action
+        def create_user_action():
+            user_id = self.user_id_entry.get().strip()
+            username = self.username_entry.get().strip()
+            password = self.password_entry.get().strip()
+            user_type = self.user_type_entry.get().strip()
+
+            if not all([user_id, username, password, user_type]):
+                messagebox.showerror("Error", "All fields are required!")
+                return
+
+            librarian_service = librarian()
+            success, message = librarian_service.create_user(
+                user_id, username, password, user_type)
+            if success:
+                messagebox.showinfo("Success", message)
+                reset_fields()
+            else:
+                messagebox.showerror("Error", message)
+
+        # Reset button action
+        def reset_fields():
+            self.user_id_entry.delete(0, "end")
+            self.username_entry.delete(0, "end")
+            self.password_entry.delete(0, "end")
+            self.user_type_entry.delete(0, "end")
+
+        # Buttons
+        self.create_user_button = ctk.CTkButton(
+            self, text="Create User", command=create_user_action, fg_color="green")
+        self.create_user_button.grid(row=5, column=0, pady=20)
+
+        self.reset_button = ctk.CTkButton(
+            self, text="Reset", command=reset_fields, fg_color="red")
+        self.reset_button.grid(row=5, column=1, pady=20)
 
 
 class admin_menu(ctk.CTkFrame):
