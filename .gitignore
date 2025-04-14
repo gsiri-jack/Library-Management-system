@@ -1,2 +1,4 @@
 myenv
 new folder
+__pycache__
+.gitignore
