@@ -84,29 +84,27 @@ class LibraryManagement(ctk.CTk):
 
 def apply_treeview_style(style):
     """Applies a consistent dark theme for Treeview widgets."""
-    style.theme_use("clam")  
-    
+    style.theme_use("clam")
+
     style.configure("Treeview",
                     background="#333333",
                     foreground="white",
                     rowheight=25,
                     fieldbackground="#333333")
 
-   
     style.map("Treeview",
               background=[("selected", "#555555")],
               foreground=[("selected", "white")])
 
-  
     style.configure("Treeview.Heading",
                     background="#444444",
                     foreground="white",
                     font=("Arial", 10, "bold"),
-                    relief="solid",  
+                    relief="solid",
                     borderwidth=1)
 
     style.configure("Bordered.Treeview.Row",
-                    relief="solid", 
+                    relief="solid",
                     borderwidth=1)
 
 
@@ -120,7 +118,6 @@ class admin_panel(ctk.CTkFrame):
         self.admin.user_id = user_id
         self.user_id = user_id
 
-      
         self.view_students_frame = None
         self.add_book_frame = None
         self.remove_book_frame = None
@@ -129,7 +126,7 @@ class admin_panel(ctk.CTkFrame):
         self.add_student_frame = None
 
         self.label = ctk.CTkLabel(self, text="Admin Panel", font=("Arial", 20))
-   
+
         self.label.grid(row=0, column=1, sticky="n")
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=9, uniform='a')
@@ -214,7 +211,6 @@ class view_students_frame(ctk.CTkFrame):
         self.master.admin.user_type = user_type
         self.user_id = user_id
 
-
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_rowconfigure(0, weight=1, uniform='a')
         self.grid_rowconfigure(0, weight=3, uniform='a')
@@ -232,7 +228,6 @@ class view_students_frame(ctk.CTkFrame):
             self, text="Search", command=self.refresh_table_with_search)
         self.search_button.grid(row=2, column=0, padx=5, )
 
-
         self.style = ttk.Style(self)
         apply_treeview_style(self.style)
         self.table = ttk.Treeview(self, columns=(
@@ -242,12 +237,10 @@ class view_students_frame(ctk.CTkFrame):
         self.table.heading("Email", text="Email")
         self.table.heading("Phone", text="Phone")
 
-
         self.table.column("Student ID", width=100)
         self.table.column("Name", width=150)
         self.table.column("Email", width=150)
         self.table.column("Phone", width=100)
-
 
         self.update_table(self.table)
         self.table.grid(row=1, column=0, padx=50, pady=20, sticky="ew")
@@ -277,7 +270,6 @@ class view_students_frame(ctk.CTkFrame):
             for row in self.table.get_children():
                 self.table.delete(row)
 
-
             student_details = self.admin.get_student_details_by_username(
                 search_query)
             if student_details[0]:
@@ -295,7 +287,7 @@ class view_students_frame(ctk.CTkFrame):
                     "Info", "No student found with the given username.")
 
     def update_table(self, table):
-      
+
         for row in self.table.get_children():
             self.table.delete(row)
         student_details = self.admin.get_all_users()
@@ -315,15 +307,13 @@ class add_book_frame(ctk.CTkFrame):
         super().__init__(master)
         self.app = app
         self.master = master
-        self.admin = admin  
+        self.admin = admin
         self.user_id = userid
 
-      
         self.grid_columnconfigure(0, weight=1, uniform='a')
         self.grid_columnconfigure(1, weight=2, uniform='a')
         self.grid_rowconfigure(tuple(range(8)), weight=1, uniform='a')
 
-      
         self.title_label = ctk.CTkLabel(
             self, text="Title:", font=("Arial", 14))
         self.title_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
@@ -331,7 +321,6 @@ class add_book_frame(ctk.CTkFrame):
             self, placeholder_text="Enter book title")
         self.title_entry.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
-       
         self.author_label = ctk.CTkLabel(
             self, text="Author:", font=("Arial", 14))
         self.author_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
@@ -339,12 +328,10 @@ class add_book_frame(ctk.CTkFrame):
             self, placeholder_text="Enter author name")
         self.author_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
 
-
         self.isbn_label = ctk.CTkLabel(self, text="ISBN:", font=("Arial", 14))
         self.isbn_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
         self.isbn_entry = ctk.CTkEntry(self, placeholder_text="Enter ISBN")
         self.isbn_entry.grid(row=2, column=1, padx=10, pady=10, sticky="w")
-
 
         self.publisher_label = ctk.CTkLabel(
             self, text="Publisher:", font=("Arial", 14))
@@ -355,7 +342,6 @@ class add_book_frame(ctk.CTkFrame):
         self.publisher_entry.grid(
             row=3, column=1, padx=10, pady=10, sticky="w")
 
-       
         self.published_year_label = ctk.CTkLabel(
             self, text="Published Year:", font=("Arial", 14))
         self.published_year_label.grid(
@@ -537,7 +523,6 @@ class issue_book_frame(ctk.CTkFrame):
             self.book_details_frame, wrap="word", font=("Arial", 14), height=350, width=300)
         self.book_details_text.grid(row=0,  column=0, sticky="ns")
 
-       
         self.issue_button = ctk.CTkButton(
             self, text="Issue Book", command=self.issue_book, fg_color="green")
         self.issue_button.grid(row=7, column=0, columnspan=2, pady=20)
@@ -1054,13 +1039,13 @@ class book_suggestion_frame(ctk.CTkFrame):
             try:
                 self.image = Image.open(self.img_pathes[i])
             except Exception as e:
+                print(f"Error loading image: {e}")
             if self.image:
                 my_image = ctk.CTkImage(light_image=self.image,
                                         dark_image=self.image, size=(150, 200))
                 self.book_name = self.get_book_details(self.img_id[i])
                 self.image_label = ctk.CTkButton(
                     self, image=my_image, text='', command=lambda book_name=self.book_name: self.openBook(book_name), fg_color='transparent')
-                # self.image_label.pack()
                 self.image_label.grid(
                     row=0, column=i, padx=10, pady=20, sticky="news")
 
