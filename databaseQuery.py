@@ -108,7 +108,10 @@ class services:
         params = (key_value,)
         result = self.db_connection.fetch_results(query, params)
         if result:
-            return True, result[0][columnName]
+            if columnName == '*':
+                return True, result[0]
+            else:
+                return True, result[0][columnName]
         return False, "Book not found."
 
     def check_book_issued(self, book_id):
@@ -119,10 +122,37 @@ class services:
             return True, "Book is issued."
         return False, "Book is not issued."
 
+    def calculate_fine(self, book_id):
+        query = "SELECT issue_date, return_date FROM issues_table WHERE book_id = %s"
+        params = (book_id,)
+        result = self.db_connection.fetch_results(query, params)
+        print(result)
+        if result:
+            issue_date = result[0]['issue_date']
+            return_date = result[0]['return_date']
+            current_date = datetime.now()
+
+            if current_date < return_date:
+                overdue_days = (abs(current_date - return_date)).days
+                fine_amount = overdue_days * 5
+                return True, fine_amount
+            else:
+                return False, "Book is not overdue."
+        return False, "Book not found."
+
+    def get_user_details(self, user_id):
+        query = "SELECT username FROM users_table WHERE user_id = %s"
+        params = (user_id,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            return True, result[0]['username']
+        return False, "User not found."
+
 
 class librarian(services):
     # @admin_only
     # @require_verification
+
     def insert_book(self, title, author, genre, isbn, publisher, published_year, pages, image_id):
         query = """
         INSERT INTO book_table (title, author, genre, isbn, publisher, published_year, pages,image_id)
@@ -132,18 +162,23 @@ class librarian(services):
                   published_year, pages, image_id)
         try:
             self.db_connection.execute_query(query, params)
-            return True, "Book inserted successfully."
         except Error as e:
             return False, f"Error inserting book: {e}"
+
+        book_id = self.get_book_details("isbn", isbn, "book_id")
+        if book_id[0]:
+            book_id = book_id[1]
+            return True, book_id
 
     # @admin_only
     # @require_verification
     def remove_book(self, book_id):
+        title = self.get_book_details("book_id", book_id, "title")
         query = "DELETE FROM book_table WHERE book_id = %s"
         params = (book_id,)
         try:
             self.db_connection.execute_query(query, params)
-            return True, "Book removed successfully."
+            return True, title[1]
         except Error as e:
             return False, f"Error removing book: {e}"
 
@@ -166,7 +201,13 @@ class librarian(services):
 
     # @admin_only
     # @require_verification
-    def issue_book(self, user_id, book_id):
+    def issue_book(self, user_id, book_id, days=14):
+        try:
+            # Ensure book_id is an integer
+            book_id = int(book_id)
+        except ValueError:
+            return False, f"Invalid book ID. It must be a numeric value.{book_id}"
+
         query = "SELECT issue_id FROM issues_table WHERE book_id = %s"
         params = (book_id,)
         result = self.db_connection.fetch_results(query, params)
@@ -175,7 +216,7 @@ class librarian(services):
             return False, "Book already issued."
         else:
             issue_date = datetime.now()
-            return_date = issue_date + timedelta(days=14)
+            return_date = issue_date + timedelta(days=days)
 
             temp = self.db_connection.fetch_results(
                 "SELECT issue_id FROM issues_table")
@@ -193,6 +234,28 @@ class librarian(services):
                 return True, "Book issued successfully."
             except Error as e:
                 return False, f"Error issuing book: {e}"
+
+    def get_issued_book_details(self, book_id):
+        query = "SELECT * FROM issues_table WHERE book_id = %s"
+        params = (book_id,)
+        result = self.db_connection.fetch_results(query, params)
+        if result:
+            issue_date = result[0]['issue_date']
+            return_date = result[0]['return_date']
+            user_id = result[0]['user_id']
+            username = self.get_user_details(user_id)[1]
+
+            book_title = self.get_book_details("book_id", book_id, "title")[1]
+
+            return True, {
+                "book_id": book_id,
+                "issue_date": issue_date,
+                "return_date": return_date,
+                "user_id": user_id,
+                "username": username,
+                "title": book_title
+            }
+        return False, "No issued book found."
 
     # @admin_only
     # @require_verification
@@ -319,10 +382,3 @@ class student(services):
         return False, "No reserved books found."
 
     # @require_verification
-    def get_user_details(self, user_id):
-        query = "SELECT username FROM users_table WHERE user_id = %s"
-        params = (user_id,)
-        result = self.db_connection.fetch_results(query, params)
-        if result:
-            return True, result[0]['username']
-        return False, "User not found."

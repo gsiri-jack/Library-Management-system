@@ -75,4 +75,3 @@ stu = student()
 #     user_type='admin',
 # )
 
-staff

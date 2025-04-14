@@ -69,8 +69,8 @@ class MySQLConnection:
             return None
 
 
-conn = MySQLConnection()
-conn.connect()
-res = conn.fetch_results("SELECT * FROM book_table")
-print(res)
-conn.disconnect()
+# conn = MySQLConnection()
+# conn.connect()
+# res = conn.fetch_results("SELECT * FROM book_table")
+# print(res)
+# conn.disconnect()

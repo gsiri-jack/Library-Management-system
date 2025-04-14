@@ -422,7 +422,8 @@ class add_book_frame(ctk.CTkFrame):
             book_details['image_id']
         )
         if result[0]:  # Assuming the method returns a tuple (success, message)
-            messagebox.showinfo("Success", "Book added successfully!")
+            messagebox.showinfo(
+                "Success", f"Book added successfully!{result[1]}")
             # Clear the form
             for entry in [self.title_entry, self.author_entry, self.isbn_entry,
                           self.publisher_entry, self.published_year_entry,
@@ -442,9 +443,63 @@ class remove_book_frame(ctk.CTkFrame):
         self.master.admin.user_type = user_type
         self.user_id = userid
 
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(tuple(range(3)), weight=1, uniform='a')
+
+        # Title Label
         self.label = ctk.CTkLabel(
-            self, text="remove Book", font=("Arial", 20))
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
+            self, text="Remove Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, columnspan=2, pady=20, sticky="n")
+
+        # ISBN Entry
+        self.isbn_label = ctk.CTkLabel(
+            self, text="Enter Book Id:", font=("Arial", 14))
+        self.isbn_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.isbn_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Book Id of the book to remove")
+        self.isbn_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # Remove Button
+        self.remove_button = ctk.CTkButton(
+            self, text="Remove Book", command=self.remove_book_from_database, fg_color="red")
+        self.remove_button.grid(row=2, column=0, columnspan=2, pady=20)
+
+    def remove_book_from_database(self):
+        """Prompt confirmation before removing the book."""
+        book_id = self.isbn_entry.get().strip()
+
+        if not book_id:
+            messagebox.showerror("Error", "Book_id field cannot be empty!")
+            return
+
+        # Fetch book details to get the title
+        book_details = self.master.admin.get_book_details(
+            'book_id', book_id, 'title')
+        if not book_details[0]:
+            messagebox.showerror("Error", f"Book not found: {book_details[1]}")
+            return
+
+        book_title = book_details[1]
+
+        # Show confirmation modal
+        confirm = messagebox.askyesno(
+            "Confirm Removal",
+            f"Are you sure you want to remove the book '{book_title}'?"
+        )
+
+        if confirm:
+            result = self.master.admin.remove_book(book_id)
+            if result[0]:
+                messagebox.showinfo(
+                    "Success", f"Book '{book_title}' removed successfully!")
+                self.isbn_entry.delete(0, "end")
+            else:
+                messagebox.showerror(
+                    "Error", f"Failed to remove book: {result[1]}")
+        else:
+            messagebox.showinfo("Cancelled", "Book removal cancelled.")
 
 
 class issue_book_frame(ctk.CTkFrame):
@@ -457,9 +512,128 @@ class issue_book_frame(ctk.CTkFrame):
         self.master.admin.user_type = user_type
         self.user_id = userid
 
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(tuple(range(7)), weight=1, uniform='a')
+
+        # Title Label
         self.label = ctk.CTkLabel(
-            self, text="issue Book", font=("Arial", 20))
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
+            self, text="Issue Book", font=("Arial", 20))
+        self.label.grid(row=0, column=0, columnspan=2, pady=20, sticky="n")
+
+        # Book ID Entry
+        self.book_id_label = ctk.CTkLabel(
+            self, text="Enter Book ID:", font=("Arial", 14))
+        self.book_id_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.book_id_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Book ID")
+        self.book_id_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # Number of Days Entry
+        self.days_label = ctk.CTkLabel(
+            self, text="Number of Days (Max 14):", font=("Arial", 14))
+        self.days_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
+        self.days_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter number of days")
+        self.days_entry.grid(row=2, column=1, padx=10, pady=10, sticky="w")
+
+        # Get Details Button
+        self.get_details_button = ctk.CTkButton(
+            self, text="Get Details", command=self.get_book_details, fg_color="blue")
+        self.get_details_button.grid(row=3, column=0, columnspan=2, pady=10)
+
+        # Book Details Section
+        self.book_details_label = ctk.CTkLabel(
+            self, text="Book Details:", font=("Arial", 16))
+        self.book_details_label.grid(
+            row=4, column=0, columnspan=2, pady=10, sticky="n")
+
+        # Use a scrollable text box for better appearance and functionality
+        self.book_details_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.book_details_frame.grid(
+            row=5, column=0, rowspan=2, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.book_details_frame.grid_rowconfigure(0, weight=1)
+        self.book_details_frame.grid_columnconfigure(0, weight=1)
+
+        self.book_details_text = ctk.CTkTextbox(
+            self.book_details_frame, wrap="word", font=("Arial", 14), height=350, width=300)
+        self.book_details_text.grid(row=0,  column=0, sticky="ns")
+
+        # Add a scrollbar for the text box
+        # self.scrollbar = ctk.CTkScrollbar(
+        #     self.book_details_frame, command=self.book_details_text.yview)
+        # self.scrollbar.grid(row=0, column=1, sticky="ns")
+        # self.book_details_text.configure(yscrollcommand=self.scrollbar.set)
+
+        # Issue Button
+        self.issue_button = ctk.CTkButton(
+            self, text="Issue Book", command=self.issue_book, fg_color="green")
+        self.issue_button.grid(row=7, column=0, columnspan=2, pady=20)
+
+    def get_book_details(self):
+        """Fetch and display book details based on the entered Book ID."""
+        book_id = self.book_id_entry.get().strip()
+        print(book_id)
+        if not book_id:
+            messagebox.showerror("Error", "Book ID cannot be empty!")
+            return
+
+        # Fetch book details
+        book_details = self.master.admin.get_book_details(
+            'book_id', book_id, '*')
+        if not book_details[0]:
+            messagebox.showerror("Error", f"Book not found: {book_details[1]}")
+            self.book_details_text.configure(text="")
+            return
+        print(book_details[1])
+        # Display book details
+        book = book_details[1]
+        details = (
+            f'Book ID: {book["book_id"]}\n'
+            f"Title: {book['title']}\n"
+            f"Author: {book['author']}\n"
+            f"Genre: {book['genre']}\n"
+            f"Publisher: {book['publisher']}\n"
+            f"Published Year: {book['published_year']}\n"
+            f"Pages: {book['pages']}\n"
+            f"ISBN: {book['isbn']}\n"
+            f"Status: {'Issued' if self.master.admin.check_book_issued(book_id)[0] else 'Available'}"
+        )
+        self.book_details_text.delete("1.0", "end")
+        self.book_details_text.insert("1.0", details)
+
+    def issue_book(self):
+        """Handle the book issuing process."""
+
+        book_id = self.book_id_entry.get().strip()
+        days = self.days_entry.get().strip()
+        print(book_id, days)
+        if not book_id or not days:
+            messagebox.showerror(
+                "Error", "Both Book ID and Number of Days are required!")
+            return
+
+        if not days.isdigit() or int(days) > 14:
+            messagebox.showerror(
+                "Error", "Number of days must be a valid number and not exceed 14!")
+            return
+
+        # Check if the book is already issued
+        if self.master.admin.check_book_issued(book_id)[0]:
+            messagebox.showerror("Error", "This book is already issued!")
+            return
+
+        # Issue the book
+        result = self.master.admin.issue_book(self.user_id, book_id, int(days))
+        if result[0]:
+            messagebox.showinfo(
+                "Success", f"Book issued successfully for {days} days!")
+            self.book_id_entry.delete(0, "end")
+            self.days_entry.delete(0, "end")
+            self.book_details_text.configure(text="")
+        else:
+            messagebox.showerror("Error", f"Failed to issue book: {result[1]}")
 
 
 class return_book_frame(ctk.CTkFrame):
@@ -472,9 +646,122 @@ class return_book_frame(ctk.CTkFrame):
         self.master.admin.user_type = user_type
         self.user_id = userid
 
+        # Configure grid layout
+        self.grid_columnconfigure(0, weight=1, uniform='a')
+        self.grid_columnconfigure(1, weight=2, uniform='a')
+        self.grid_rowconfigure(tuple(range(9)), weight=1, uniform='a')
+
+        # Title Label
         self.label = ctk.CTkLabel(
-            self, text="return Book", font=("Arial", 20))
-        self.label.grid(row=0, column=0, pady=20, sticky="n")
+            self, text="Return Book", font=("Arial", 24, "bold"))
+        self.label.grid(row=0, column=0, columnspan=2, pady=20, sticky="n")
+
+        # Book ID Entry
+        self.book_id_label = ctk.CTkLabel(
+            self, text="Enter Book ID:", font=("Arial", 16))
+        self.book_id_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.book_id_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Book ID", width=300)
+        self.book_id_entry.grid(row=1, column=1, padx=10, pady=10, sticky="w")
+
+        # Fetch Details Button
+        self.fetch_button = ctk.CTkButton(
+            self, text="Go", command=self.fetch_book_details, fg_color="blue")
+        self.fetch_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+        # Book Details Section
+        self.book_details_label = ctk.CTkLabel(
+            self, text="Book Details:", font=("Arial", 18, "bold"))
+        self.book_details_label.grid(
+            row=3, column=0, columnspan=2, pady=10, sticky="n")
+
+        self.book_details_text = ctk.CTkTextbox(
+            self, wrap="word", font=("Arial", 14), height=150, width=400)
+        self.book_details_text.grid(
+            row=4, column=0, rowspan=2, columnspan=2, padx=10, pady=10, sticky="ns")
+        self.book_details_text.configure(state="disabled")
+
+        # Fine Receipt ID Entry (hidden initially)
+        self.fine_receipt_label = ctk.CTkLabel(
+            self, text="Enter Fine Receipt ID:", font=("Arial", 16))
+        self.fine_receipt_entry = ctk.CTkEntry(
+            self, placeholder_text="Enter Fine Receipt ID", width=300)
+
+        # Return Book Button
+        self.return_button = ctk.CTkButton(
+            self, text="Return Book", command=self.return_book, fg_color="green")
+        self.return_button.grid(row=7, column=0, columnspan=2, pady=20)
+
+    def fetch_book_details(self):
+        """Fetch and display book details based on the entered Book ID."""
+        book_id = self.book_id_entry.get().strip()
+        if not book_id:
+            messagebox.showerror("Error", "Book ID cannot be empty!")
+            return
+
+        # Fetch book details
+        book_details = self.master.admin.get_issued_book_details(book_id)
+        if not book_details[0]:
+            messagebox.showerror("Error", f"Book not found: {book_details[1]}")
+            return
+
+        book = book_details[1]
+
+        issued_date = book['issue_date'].strftime("%d-%m-%Y")
+        fine_result = self.master.admin.calculate_fine(book_id)
+        self.return_user_id = book['user_id']
+
+        # Display book details
+        details = (
+            f"Book ID: {book['book_id']}\n"
+            f"Title: {book['title']}\n"
+            f'username: {book["username"]}\n'
+            f"Issued Date: {issued_date}\n"
+            f"Fine: {'₹' + str(fine_result[1]) if fine_result[0] else 'No Fine'}"
+        )
+        self.book_details_text.configure(state="normal")
+        self.book_details_text.delete("1.0", "end")
+        self.book_details_text.insert("1.0", details)
+        self.book_details_text.configure(state="disabled")
+
+        # Show fine receipt entry if fine exists
+        if fine_result[0]:
+            self.fine_receipt_label.grid(
+                row=6, column=0, padx=10, pady=10, sticky="e")
+            self.fine_receipt_entry.grid(
+                row=6, column=1, padx=10, pady=10, sticky="w")
+        else:
+            self.fine_receipt_label.grid_forget()
+            self.fine_receipt_entry.grid_forget()
+
+    def return_book(self):
+        """Handle the book return process."""
+        book_id = self.book_id_entry.get().strip()
+        if not book_id:
+            messagebox.showerror("Error", "Book ID cannot be empty!")
+            return
+
+        # Check for fine receipt ID if fine exists
+        fine_result = self.master.admin.calculate_fine(book_id)
+        if fine_result[0]:
+            fine_receipt_id = self.fine_receipt_entry.get().strip()
+            if not fine_receipt_id:
+                messagebox.showerror("Error", "Fine receipt ID is required!")
+                return
+
+        # Return the book
+        result = self.master.admin.return_book(self.return_user_id, book_id)
+        if result[0]:
+            messagebox.showinfo("Success", "Book returned successfully!")
+            self.book_id_entry.delete(0, "end")
+            self.book_details_text.configure(state="normal")
+            self.book_details_text.delete("1.0", "end")
+            self.book_details_text.configure(state="disabled")
+            self.fine_receipt_label.grid_forget()
+            self.fine_receipt_entry.grid_forget()
+        else:
+            messagebox.showerror(
+                "Error", f"Failed to return book: {result[1]}")
 
 
 class add_student_frame(ctk.CTkFrame):
