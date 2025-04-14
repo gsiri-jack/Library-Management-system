@@ -25,21 +25,39 @@ class LibraryManagement(ctk.CTk):
         for widget in self.container.winfo_children():
             widget.destroy()
 
-        frame = ctk.CTkFrame(self.container)
-        frame.pack(expand=True)
+        frame = ctk.CTkFrame(
+            self.container, fg_color="#2c2f33", corner_radius=15)
+        frame.pack(expand=True, padx=20, pady=20)
 
-        label = ctk.CTkLabel(frame, text="Login", font=("Arial", 20))
-        label.pack(pady=20)
+        image_placeholder = ctk.CTkLabel(
+            frame, text="", image=None, width=200, height=200, fg_color="transparent")
+        image_placeholder.grid(row=0, column=0, columnspan=2, pady=20)
 
-        self.username_entry = ctk.CTkEntry(frame, placeholder_text="Username")
-        self.username_entry.pack(pady=5)
+        title_label = ctk.CTkLabel(
+            frame, text="Welcome to Library Management", font=("Arial", 24, "bold"), text_color="#ffffff")
+        title_label.grid(row=1, column=0, columnspan=2, pady=10)
 
+        username_label = ctk.CTkLabel(
+            frame, text="Username", font=("Arial", 14), text_color="#ffffff")
+        username_label.grid(row=2, column=0, sticky="e", padx=10, pady=10)
+        self.username_entry = ctk.CTkEntry(
+            frame, placeholder_text="Enter your username", width=250)
+        self.username_entry.grid(row=2, column=1, padx=10, pady=10)
+
+        password_label = ctk.CTkLabel(
+            frame, text="Password", font=("Arial", 14), text_color="#ffffff")
+        password_label.grid(row=3, column=0, sticky="e", padx=10, pady=10)
         self.password_entry = ctk.CTkEntry(
-            frame, placeholder_text="Password", show="•")
-        self.password_entry.pack(pady=5)
+            frame, placeholder_text="Enter your password", show="*", width=250)
+        self.password_entry.grid(row=3, column=1, padx=10, pady=10)
 
-        login_button = ctk.CTkButton(frame, text="Login", command=self.login)
-        login_button.pack(pady=10)
+        login_button = ctk.CTkButton(
+            frame, text="Login", command=self.login, fg_color="#4CAF50", hover_color="#45a049", font=("Arial", 14))
+        login_button.grid(row=4, column=0, columnspan=2, pady=20)
+
+        footer_label = ctk.CTkLabel(
+            frame, text="© 2023 Library Management System", font=("Arial", 10), text_color="#aaaaaa")
+        footer_label.grid(row=5, column=0, columnspan=2, pady=10)
 
     def login(self):
         self.user_id = self.username_entry.get().strip()
