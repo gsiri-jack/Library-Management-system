@@ -58,7 +58,7 @@ class services:
         self.user_type = None
         return True, "User has been logged out successfully."
 
-    # @require_verification
+    @require_verification
     def search_book(self, book_id=None, title=None, author=None, genre=None, isbn=None):
         query = "SELECT * FROM book_table WHERE 1=1"
         params = []
