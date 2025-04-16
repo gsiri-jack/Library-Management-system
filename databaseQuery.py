@@ -5,10 +5,6 @@ import json
 from datetime import datetime, timedelta
 from functools import wraps
 
-# Load book data from JSON file
-with open("bookdata.json", "r") as file:
-    data = json.load(file)
-
 
 def require_verification(func):
     """Decorator to ensure the user is verified before performing any operation."""

@@ -1,0 +1,8 @@
+mysql-connector-python
+pymysql
+tkinter
+bcrypt
+datetime
+functools
+json
+customtkinter

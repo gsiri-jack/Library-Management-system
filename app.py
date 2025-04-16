@@ -4,8 +4,7 @@ from tkinter import ttk
 from databaseQuery import librarian, student, services
 from PIL import Image
 from random import randint
-import threading
-import time
+
 
 
 class LibraryManagement(ctk.CTk):
