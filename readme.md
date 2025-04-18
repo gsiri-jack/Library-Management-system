@@ -8,6 +8,11 @@
 
 </p>
 
+## About the Project
+
+- The Library Management System is a simple and helpful tool made to make library work easy and fast. It lets librarians handle books, members, and book issues or returns using a user-friendly window-based interface.
+- It is built using Python and MySQL, which helps safely store and manage data. The code follows object-oriented programming rules, making it clean, easy to understand, and ready for future updates.
+
 
 ## Features
 
