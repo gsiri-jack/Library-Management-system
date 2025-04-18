@@ -10,6 +10,10 @@ A Python-based application demonstrating GUI development with Tkinter, database 
 
 </p>
 
+## Description
+The Library Management System is a comprehensive application designed to simplify and automate library operations. It allows librarians to manage books, members, and transactions efficiently through an intuitive graphical user interface. The system supports functionalities such as adding, updating, and deleting book and member records, issuing and returning books, and generating reports. By integrating Python with MySQL, the application ensures reliable data storage and retrieval, while adhering to object-oriented programming principles for maintainability and scalability.
+
+
 ## Skills Demonstrated
 
 - Python Programming
