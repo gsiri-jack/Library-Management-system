@@ -1,6 +1,15 @@
 # Library Management System
 
 A Python-based application demonstrating GUI development with Tkinter, database integration with MySQL, and object-oriented programming principles.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.9+-blue?logo=python" />
+  <img src="https://img.shields.io/badge/GUI-Tkinter-yellow" />
+  <img src="https://img.shields.io/badge/Database-MySQL-blue" />
+  <img src="https://img.shields.io/badge/OOP-Implemented-green" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey" />
+  <img src="https://img.shields.io/badge/License-MIT-brightgreen" />
+  <img src="https://img.shields.io/badge/Status-Completed-brightgreen" />
+</p>
 
 ## Skills Demonstrated
 
