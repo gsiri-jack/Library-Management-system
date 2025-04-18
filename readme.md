@@ -58,7 +58,7 @@
 
 Run the main Python script to launch the application:
 ```bash
-python main.py
+python app.py
 ```
 
 ## License
