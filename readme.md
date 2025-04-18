@@ -1,6 +1,4 @@
 # Library Management System
-
-A Python-based application demonstrating GUI development with Tkinter, database integration with MySQL, and object-oriented programming principles.
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9+-blue?logo=python" />
   <img src="https://img.shields.io/badge/GUI-Tkinter-yellow" />
@@ -10,9 +8,12 @@ A Python-based application demonstrating GUI development with Tkinter, database 
 
 </p>
 
-## Description
-The Library Management System is a comprehensive application designed to simplify and automate library operations. It allows librarians to manage books, members, and transactions efficiently through an intuitive graphical user interface. The system supports functionalities such as adding, updating, and deleting book and member records, issuing and returning books, and generating reports. By integrating Python with MySQL, the application ensures reliable data storage and retrieval, while adhering to object-oriented programming principles for maintainability and scalability.
 
+## Features
+
+- User-friendly graphical interface built with Tkinter.
+- Robust database design and interaction using MySQL.
+- Modular and maintainable code structure following OOP principles.
 
 ## Skills Demonstrated
 
@@ -22,11 +23,6 @@ The Library Management System is a comprehensive application designed to simplif
 - GUI Development with Tkinter
 - Integration of Python with MySQL
 
-## Features
-
-- User-friendly graphical interface built with Tkinter.
-- Robust database design and interaction using MySQL.
-- Modular and maintainable code structure following OOP principles.
 
 ## Prerequisites
 
@@ -38,8 +34,7 @@ The Library Management System is a comprehensive application designed to simplif
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+   git clone https://github.com/gsiri-jack/Library-Management-system
    ```
 
 2. Install required Python libraries:
