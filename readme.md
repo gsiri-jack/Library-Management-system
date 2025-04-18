@@ -7,8 +7,7 @@ A Python-based application demonstrating GUI development with Tkinter, database 
   <img src="https://img.shields.io/badge/Database-MySQL-blue" />
   <img src="https://img.shields.io/badge/OOP-Implemented-green" />
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey" />
-  <img src="https://img.shields.io/badge/License-MIT-brightgreen" />
-  <img src="https://img.shields.io/badge/Status-Completed-brightgreen" />
+
 </p>
 
 ## Skills Demonstrated
