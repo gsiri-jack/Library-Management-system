@@ -61,6 +61,3 @@ Run the main Python script to launch the application:
 python app.py
 ```
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
